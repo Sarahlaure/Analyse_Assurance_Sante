@@ -1,0 +1,23 @@
+bookdown::gitbook:
+  css: style.css
+  includes:
+    in_header: favicon.html #Pour mettre le favicon
+    after_body: footer.html     # Footer pour le HTML
+  config:
+    toc:
+      before: |
+        <li style="text-align:center;">
+          <img src="images/prevision.png" style="max-width:200px; width:100%; height:auto; display:inline-block; margin-bottom:0.35em;">
+        </li>
+        <li><a href="index.html">Prévision des coûts médicaux</a></li>
+      after: |
+        <li><a href="https://github.com/rstudio/bookdown" target="blank">Publié avec bookdown</a></li>
+    edit: https://github.com/rstudio/bookdown-demo/edit/master/%s
+    download: ["pdf", "epub"]
+bookdown::pdf_book:
+  includes:
+    in_header: preamble.tex
+  latex_engine: xelatex
+  citation_package: natbib
+  keep_tex: yes
+bookdown::epub_book: default

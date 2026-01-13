@@ -1,0 +1,17 @@
+# Conclusion générale
+
+Ce projet d’initiation au Big Data et au Cloud Computing a permis de mettre en œuvre, de manière concrète, les principaux concepts abordés en cours à travers l’étude d’un cas pratique réel sur l’analyse des données de marché des cryptomonnaies.
+
+Dans un premier temps, le travail a mis en évidence les limites des approches traditionnelles de traitement des données face à des volumes importants, des flux continus et des exigences de réactivité accrues. Ces constats ont conduit à l’utilisation d’Apache Spark, une technologie Big Data moderne, capable de répondre à ces enjeux grâce à son modèle de calcul distribué et en mémoire.
+
+La première partie pratique du projet s’est concentrée sur le **traitement batch**. À partir des données de marché collectées depuis la plateforme Binance et stockées dans une base PostgreSQL, Apache Spark a été utilisé pour construire des indicateurs analytiques pertinents (rendement, volatilité, volume, classements Top 5). Cette approche a permis de produire des analyses consolidées, synthétisées sous la forme de rapports HTML automatisés, facilitant l’interprétation des résultats et leur diffusion. Le traitement batch s’est révélé particulièrement adapté aux analyses globales et aux besoins de reporting périodique.
+
+La seconde partie du projet a porté sur le **traitement streaming**, illustrant la capacité de Spark à gérer des flux de données quasi temps réel. Grâce à l’intégration de Kafka et à l’utilisation de WebSockets pour la récupération des données Binance, un pipeline de streaming complet a été mis en place. Apache Spark Structured Streaming a permis de consommer, transformer et stocker les données en continu, tout en conservant un modèle de programmation proche de celui des traitements batch. Cette approche a mis en évidence l’intérêt du streaming pour des cas d’usage nécessitant une réactivité accrue et une surveillance continue des données de marché.
+
+L’architecture hybride adoptée, combinant Spark en local et des services d’infrastructure conteneurisés via Docker (Kafka, Zookeeper, PostgreSQL), a également permis de souligner l’importance de la reproductibilité et de la modularité dans les projets Big Data. L’utilisation de Docker a facilité le déploiement des services, tandis que Spark a assuré la cohérence des traitements analytiques.
+
+Au-delà des résultats obtenus, ce projet a permis de mieux comprendre les **forces et limites d’Apache Spark**. Si Spark offre des performances élevées, une grande polyvalence et une forte capacité de montée en charge, son utilisation efficace nécessite une bonne gestion des ressources et une compréhension des compromis techniques, notamment en matière de mémoire et de latence en streaming.
+
+En conclusion, ce travail illustre la manière dont les technologies Big Data et Cloud peuvent être mobilisées pour construire des pipelines de données complets, allant de la collecte à l’analyse, en passant par le stockage et la visualisation. Il constitue une base solide pour aborder des architectures plus avancées et des cas d’usage industriels, tout en offrant une compréhension concrète des enjeux actuels du traitement des données massives.
+
+</div>

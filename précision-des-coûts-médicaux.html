@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>1 Précision des coûts médicaux | index.knit</title>
+  <meta name="description" content="" />
+  <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="1 Précision des coûts médicaux | index.knit" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="1 Précision des coûts médicaux | index.knit" />
+  
+  
+  
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link rel="shortcut icon" href="images/bookdown.ico" type="image/x-icon">
+
+
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li style="text-align:center;">
+  <img src="images/image2.png" style="max-width:200px; width:100%; height:auto; display:inline-block; margin-bottom:0.35em;">
+</li>
+<li><a href="index.html"> Apache Spark</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path=""><a href="#précision-des-coûts-médicaux"><i class="fa fa-check"></i><b>1</b> Précision des coûts médicaux</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Publié avec bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./"></a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<!--bookdown:title:end-->
+<!--bookdown:title:start-->
+<div id="précision-des-coûts-médicaux" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">1</span> Précision des coûts médicaux<a href="#précision-des-coûts-médicaux" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<style>
+/* Bloc logo : centré + largeur fixe + pas de scroll */
+.cover-logo{
+  width: 800px;              
+  max-width: 100%;
+  margin: 14px auto;         
+  text-align: center;
+  overflow: visible !important;  
+}
+
+/* Image centrée */
+.cover-logo img{
+  display: block;
+  margin: 0 auto 8px auto;
+}
+
+/* Légende : figée, centrée, retour à la ligne, pas de scroll */
+.cover-logo .cap{
+  display: block;
+  margin: 0 auto;
+  max-width: 520px;          
+  white-space: normal !important;  
+  overflow: visible !important;
+  text-overflow: clip !important;
+  word-break: break-word;         
+  overflow-wrap: anywhere;       
+  line-height: 1.35;
+  color: #6b7280;
+  font-style: italic;
+  font-size: 18px;
+}
+</style>
+<div class="cover-logo">
+<img src="images/LOGO2.jpg" style="width:90px;">
+<div class="cap">
+Agence nationale de la Statistique et de la Démographie (ANSD)
+</div>
+</div>
+<div class="cover-logo">
+<img src="images/LOGO1.jpg" style="width:70px;">
+<div class="cap">
+École nationale de la Statistique et de l’Analyse économique Pierre Ndiaye (ENSAE)
+</div>
+</div>
+</div>
+<div class="cover-card">
+<div class="cover-pill">
+Présentation du projet de machine learning – Année académique 2025-2026
+</div>
+<div class="cover-title">
+<p>Prévision des coûts médicaux</p>
+</div>
+<div class="cover-line">
+
+</div>
+<img class="cover-spark" src="images/prevision.png" alt="Spark" />
+<div class="cover-grid">
+<div class="cover-box">
+<div class="cover-kicker">
+Rédigé par
+</div>
+<div class="cover-names">
+DIALLO Cheick Oumar<br/> FALL Ndeye Ramatoulaye Ndoye<br/> FOGWOUNG DJOUFACK Sarah-Laure<br/> NGUEMFOUO NGOUMTSA Célina <br/> RASAMOELINA Nihaviana Albert Paulinah
+</div>
+<div class="cover-note">
+Élèves ingénieurs statisticiens économistes (ISE2)
+</div>
+</div>
+<div class="cover-box">
+<div class="cover-kicker">
+Sous la supervision de
+</div>
+<div class="cover-supervisor">
+Mme DIAW Mously
+</div>
+<div class="cover-note">
+Freelance Senior Data Scientist / ML Engineer
+</div>
+<div class="cover-pill">
+<p>Livre réalisé dans le cadre du cours d’Initiation au Big Data &amp; Cloud Computing.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<footer style="
+  margin-top:3.2em;
+  padding:0;
+  font-family: inherit;
+">
+  <!-- Bande supérieure (accent) -->
+  <div style="
+    height:6px;
+    background: linear-gradient(90deg, #0A1C34 0%, #1A4FA3 40%, #2D7FF9 100%);
+  "></div>
+
+  <!-- Fond footer -->
+  <div style="
+    background: radial-gradient(circle at top, rgba(45,127,249,0.14) 0%, rgba(10,28,52,0.00) 55%),
+                linear-gradient(180deg, #0A1C34 0%, #081A2F 100%);
+    color:#EAF2FF;
+    padding:22px 0;
+    border-top:1px solid rgba(255,255,255,0.08);
+  ">
+    <div style="
+      width:1100
+      margin:0 auto;
+      padding:0 16px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      align-items:center;
+      justify-content:space-between;
+    ">
+
+      <!-- Bloc gauche -->
+      <div style="min-width:260px;">
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:10px;
+          margin-bottom:6px;
+        ">
+          <span style="
+            display:inline-flex;
+            width:34px; height:34px;
+            border-radius:10px;
+            background: rgba(45,127,249,0.18);
+            border:1px solid rgba(45,127,249,0.35);
+            align-items:center; justify-content:center;
+            font-size:16px;
+          ">⚡</span>
+
+          <div style="line-height:1.1;">
+            <div style="
+              font-weight:700;
+              font-size:0.98em;
+              letter-spacing:0.2px;
+            ">Spark — Traitement des données massives</div>
+            <div style="
+              font-size:0.82em;
+              color:rgba(234,242,255,0.78);
+              margin-top:2px;
+            ">Temps réel · Batch · Streaming</div>
+          </div>
+        </div>
+
+        <div style="
+          font-size:0.82em;
+          color:rgba(234,242,255,0.78);
+          line-height:1.35;
+        ">
+          ENSAE Dakar Pierre Ndiaye· ISE 2· <span style="white-space:nowrap;">2025–2026</span><br/>
+          Cours : <em>Initiation au Big Data &amp; Cloud Computing</em>
+        </div>
+      </div>
+
+      <!-- Bloc centre (membres) -->
+      <div style="
+        flex:1;
+        min-width:280px;
+        padding:12px 14px;
+        border-radius:14px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.10);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+      ">
+        <div style="
+          font-size:0.78em;
+          color:rgba(234,242,255,0.75);
+          text-transform:uppercase;
+          letter-spacing:0.08em;
+          margin-bottom:6px;
+          text-align:center;
+        ">Membres du groupe</div>
+
+        <div style="
+          font-size:0.86em;
+          line-height:1.35;
+          color:#EAF2FF;
+        ">
+          <strong>COMPAORE Mohamadi Bassirou</strong> ·
+          <strong>DIAKHATE Khadidiatou</strong> ·
+          <strong>DIALLO Sega Aissatou</strong> ·
+          <strong>FOGWOUNG DJOUFACK Sarah-Laure</strong> ·
+          <strong>FOUMSOU Lawa Prosper</strong>
+        </div>
+      </div>
+
+      <!-- Bloc droit (liens) -->
+      <div style="min-width:240px; text-align:right;">
+        <div style="
+          font-size:0.78em;
+          color:rgba(234,242,255,0.75);
+          margin-bottom:8px;
+        "> Cliquez ici pour accéder à nos ressources </div>
+
+        <a href="https://github.com/Sarahlaure/projet-BDCC-2025---spark-real-time-data-processing-groupe7-"
+           target="_blank" rel="noopener"
+           style="
+             display:inline-block;
+             padding:9px 12px;
+             border-radius:12px;
+             background: rgba(45,127,249,0.18);
+             border:1px solid rgba(45,127,249,0.40);
+             color:#EAF2FF;
+             text-decoration:none;
+             font-weight:600;
+             font-size:0.84em;
+             margin-left:8px;
+           ">
+          GitHub ↗
+        </a>
+
+        <div style="
+          margin-top:10px;
+          font-size:0.78em;
+          color:rgba(234,242,255,0.55);
+        ">
+          © 2025–2026 · Groupe 7
+        </div>
+      </div>
+
+    </div>
+  </div>
+</footer>
+            </section>
+
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": false,
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": null,
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": false,
+  "toc": {
+    "collapse": "section"
+  }
+});
+});
+</script>
+
+</body>
+
+</html>

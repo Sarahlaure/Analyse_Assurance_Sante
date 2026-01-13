@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>4 Régressions non linéaires | Prévision des coûts médicaux</title>
+  <meta name="description" content="4 Régressions non linéaires | Prévision des coûts médicaux" />
+  <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="4 Régressions non linéaires | Prévision des coûts médicaux" />
+  <meta property="og:type" content="book" />
+  
+  
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="4 Régressions non linéaires | Prévision des coûts médicaux" />
+  
+  
+  
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="modèles-de-régression-linéaire.html"/>
+<link rel="next" href="méthodes-ensemblistes.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
+<script src="libs/datatables-binding-0.33/datatables.js"></script>
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
+<link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
+<script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link rel="shortcut icon" href="images/bookdown.ico" type="image/x-icon">
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li style="text-align:center;">
+  <img src="images/prevision.png" style="max-width:200px; width:100%; height:auto; display:inline-block; margin-bottom:0.35em;">
+</li>
+<li><a href="index.html">Prévision des coûts médicaux</a></li>
+
+<li class="divider"></li>
+<li><a href="index.html#section" id="toc-section"></a></li>
+<li class="chapter" data-level="1" data-path="introduction.html"><a href="introduction.html"><i class="fa fa-check"></i><b>1</b> Introduction</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="introduction.html"><a href="introduction.html#contexte-général"><i class="fa fa-check"></i><b>1.1</b> Contexte général</a></li>
+<li class="chapter" data-level="1.2" data-path="introduction.html"><a href="introduction.html#contexte-de-létude-et-source-des-données"><i class="fa fa-check"></i><b>1.2</b> Contexte de l’étude et source des données</a></li>
+<li class="chapter" data-level="1.3" data-path="introduction.html"><a href="introduction.html#objectifs-du-projet"><i class="fa fa-check"></i><b>1.3</b> Objectifs du projet</a></li>
+<li class="chapter" data-level="1.4" data-path="introduction.html"><a href="introduction.html#organisation-du-document"><i class="fa fa-check"></i><b>1.4</b> Organisation du document</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="analyse-de-la-base-de-données.html"><a href="analyse-de-la-base-de-données.html"><i class="fa fa-check"></i><b>2</b> Analyse de la base de données</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="analyse-de-la-base-de-données.html"><a href="analyse-de-la-base-de-données.html#présentation-des-données"><i class="fa fa-check"></i><b>2.1</b> Présentation des données</a></li>
+<li class="chapter" data-level="2.2" data-path="analyse-de-la-base-de-données.html"><a href="analyse-de-la-base-de-données.html#prétraitement-des-données"><i class="fa fa-check"></i><b>2.2</b> Prétraitement des données</a></li>
+<li class="chapter" data-level="2.3" data-path="analyse-de-la-base-de-données.html"><a href="analyse-de-la-base-de-données.html#analyse-descriptive"><i class="fa fa-check"></i><b>2.3</b> Analyse descriptive</a></li>
+<li class="chapter" data-level="2.4" data-path="analyse-de-la-base-de-données.html"><a href="analyse-de-la-base-de-données.html#transformation-de-la-variable-cible"><i class="fa fa-check"></i><b>2.4</b> Transformation de la variable cible</a></li>
+<li class="chapter" data-level="2.5" data-path="analyse-de-la-base-de-données.html"><a href="analyse-de-la-base-de-données.html#choix-des-variables-explicatives-et-de-la-cible"><i class="fa fa-check"></i><b>2.5</b> Choix des variables explicatives et de la cible</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html"><i class="fa fa-check"></i><b>3</b> Modèles de régression linéaire</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#environnement-et-bibliothèques-utilisées"><i class="fa fa-check"></i><b>3.1</b> Environnement et bibliothèques utilisées</a></li>
+<li class="chapter" data-level="3.2" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#préliminaires"><i class="fa fa-check"></i><b>3.2</b> Préliminaires</a></li>
+<li class="chapter" data-level="3.3" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#régression-linéaire-multiple-ols"><i class="fa fa-check"></i><b>3.3</b> Régression linéaire multiple (OLS)</a></li>
+<li class="chapter" data-level="3.4" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#diagnostics-statistiques-des-modèles-linéaires"><i class="fa fa-check"></i><b>3.4</b> Diagnostics statistiques des modèles linéaires</a></li>
+<li class="chapter" data-level="3.5" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#tous-les-vif-sont-compris-entre-1-et-5.-il-nexiste-aucun-niveau-critique-de-multicolinéarité-chaque-variable-apporte-une-information-indépendante-au-modèle."><i class="fa fa-check"></i><b>3.5</b> Tous les VIF sont compris entre 1 et 5. Il n’existe aucun niveau critique de multicolinéarité ; chaque variable apporte une information indépendante au modèle.</a></li>
+<li class="chapter" data-level="3.6" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#régression-ridge"><i class="fa fa-check"></i><b>3.6</b> Régression Ridge</a></li>
+<li class="chapter" data-level="3.7" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#le-modèle-ridge-sur-cible-directe-est-le-plus-performant-en-termes-de-variance-expliquée-r2-tandis-que-la-version-log-réduit-lerreur-relative-mape."><i class="fa fa-check"></i><b>3.7</b> Le modèle Ridge sur cible directe est le plus performant en termes de variance expliquée (<span class="math inline">\(R^2\)</span>), tandis que la version log réduit l’erreur relative (MAPE).</a></li>
+<li class="chapter" data-level="3.8" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#régression-lasso"><i class="fa fa-check"></i><b>3.8</b> Régression Lasso</a></li>
+<li class="chapter" data-level="3.9" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#régression-elastic-net"><i class="fa fa-check"></i><b>3.9</b> Régression Elastic Net</a></li>
+<li class="chapter" data-level="3.10" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#sur-la-cible-directe-lelasticnet-converge-vers-un-comportement-lasso-l1_ratio1.0.-sur-la-cible-log-il-adopte-un-profil-plus-équilibré-avec-un-ratio-de-0.1."><i class="fa fa-check"></i><b>3.10</b> Sur la cible directe, l’ElasticNet converge vers un comportement Lasso (<code>l1_ratio=1.0</code>). Sur la cible log, il adopte un profil plus équilibré avec un ratio de 0.1.</a></li>
+<li class="chapter" data-level="3.11" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#synthèse-des-résultats-des-modèles-linéaires"><i class="fa fa-check"></i><b>3.11</b> Synthèse des résultats des modèles linéaires</a></li>
+<li class="chapter" data-level="3.12" data-path="modèles-de-régression-linéaire.html"><a href="modèles-de-régression-linéaire.html#conclusion-intermédiaire"><i class="fa fa-check"></i><b>3.12</b> Conclusion intermédiaire</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html"><i class="fa fa-check"></i><b>4</b> Régressions non linéaires</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html#environnement-et-bibliothèques-utilisées-1"><i class="fa fa-check"></i><b>4.1</b> Environnement et bibliothèques utilisées</a></li>
+<li class="chapter" data-level="4.2" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html#rappels"><i class="fa fa-check"></i><b>4.2</b> Rappels</a></li>
+<li class="chapter" data-level="4.3" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html#k-nearest-neighbors-knn-regressor"><i class="fa fa-check"></i><b>4.3</b> K-Nearest Neighbors (KNN Regressor)</a></li>
+<li class="chapter" data-level="4.4" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html#bien-que-le-r2-soit-plus-élevé-sur-les-charges-directes-lapproche-log-est-plus-pertinente-objectivement-car-elle-réduit-lerreur-relative-mape-de-35.35-à-24.25-.-la-transformation-log-permet-de-lisser-linfluence-des-voisins-aux-coûts-extrêmes."><i class="fa fa-check"></i><b>4.4</b> Bien que le <span class="math inline">\(R^2\)</span> soit plus élevé sur les charges directes, l’approche <strong>Log</strong> est plus pertinente objectivement car elle réduit l’erreur relative (MAPE) de <strong>35.35 % à 24.25 %</strong>. La transformation log permet de lisser l’influence des voisins aux coûts extrêmes.</a></li>
+<li class="chapter" data-level="4.5" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html#arbre-de-décision-decisiontreeregressor"><i class="fa fa-check"></i><b>4.5</b> Arbre de décision (DecisionTreeRegressor)</a></li>
+<li class="chapter" data-level="4.6" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html#random-forest-randomforestregressor"><i class="fa fa-check"></i><b>4.6</b> Random Forest (RandomForestRegressor)</a></li>
+<li class="chapter" data-level="4.7" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html#support-vector-regression-svr"><i class="fa fa-check"></i><b>4.7</b> Support Vector Regression (SVR)</a></li>
+<li class="chapter" data-level="4.8" data-path="régressions-non-linéaires.html"><a href="régressions-non-linéaires.html#tableau-comparatif-final-modèles-non-linéaires"><i class="fa fa-check"></i><b>4.8</b> Tableau comparatif final (modèles non linéaires)</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="méthodes-ensemblistes.html"><a href="méthodes-ensemblistes.html"><i class="fa fa-check"></i><b>5</b> Méthodes ensemblistes</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="méthodes-ensemblistes.html"><a href="méthodes-ensemblistes.html#environnement-et-bibliothèques-utilisées-2"><i class="fa fa-check"></i><b>5.1</b> Environnement et bibliothèques utilisées</a></li>
+<li class="chapter" data-level="5.2" data-path="méthodes-ensemblistes.html"><a href="méthodes-ensemblistes.html#processus-expérimental-commun-anti-fuite"><i class="fa fa-check"></i><b>5.2</b> Processus expérimental commun (anti-fuite)</a></li>
+<li class="chapter" data-level="5.3" data-path="méthodes-ensemblistes.html"><a href="méthodes-ensemblistes.html#description-des-algorithmes-utilisés"><i class="fa fa-check"></i><b>5.3</b> Description des algorithmes utilisés</a></li>
+<li class="chapter" data-level="5.4" data-path="méthodes-ensemblistes.html"><a href="méthodes-ensemblistes.html#resultats-des-4-scénarios-évalués"><i class="fa fa-check"></i><b>5.4</b> Resultats des 4 scénarios évalués</a></li>
+<li class="chapter" data-level="5.5" data-path="méthodes-ensemblistes.html"><a href="méthodes-ensemblistes.html#comparaison-des-résultats"><i class="fa fa-check"></i><b>5.5</b> Comparaison des résultats</a></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="selection-modele.html"><a href="selection-modele.html"><i class="fa fa-check"></i><b>6</b> Sélection et Validation du Modèle Final</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="selection-modele.html"><a href="selection-modele.html#synthèse-comparative-des-performances"><i class="fa fa-check"></i><b>6.1</b> Synthèse Comparative des Performances</a></li>
+<li class="chapter" data-level="6.2" data-path="selection-modele.html"><a href="selection-modele.html#discussion-technique-et-justification-du-choix"><i class="fa fa-check"></i><b>6.2</b> Discussion Technique et Justification du Choix</a></li>
+<li class="chapter" data-level="6.3" data-path="selection-modele.html"><a href="selection-modele.html#sélection-du-modèle"><i class="fa fa-check"></i><b>6.3</b> Sélection du Modèle</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="conclusion-générale.html"><a href="conclusion-générale.html"><i class="fa fa-check"></i><b>7</b> Conclusion générale</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="conclusion-générale.html"><a href="conclusion-générale.html#résumé-des-résultats"><i class="fa fa-check"></i><b>7.1</b> Résumé des résultats</a></li>
+<li class="chapter" data-level="7.2" data-path="conclusion-générale.html"><a href="conclusion-générale.html#limites-de-létude"><i class="fa fa-check"></i><b>7.2</b> Limites de l’étude</a></li>
+<li class="chapter" data-level="7.3" data-path="conclusion-générale.html"><a href="conclusion-générale.html#recommandations-et-perspectives"><i class="fa fa-check"></i><b>7.3</b> Recommandations et perspectives</a></li>
+<li class="chapter" data-level="7.4" data-path="conclusion-générale.html"><a href="conclusion-générale.html#bibliographie"><i class="fa fa-check"></i><b>7.4</b> Bibliographie</a></li>
+</ul></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Publié avec bookdown</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Prévision des coûts médicaux</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="régressions-non-linéaires" class="section level1 hasAnchor" number="4">
+<h1><span class="header-section-number">4</span> Régressions non linéaires<a href="régressions-non-linéaires.html#régressions-non-linéaires" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Cette sous-partie présente les modèles non linéaires entraînés après le prétraitement des données.</p>
+<div id="environnement-et-bibliothèques-utilisées-1" class="section level2 hasAnchor" number="4.1">
+<h2><span class="header-section-number">4.1</span> Environnement et bibliothèques utilisées<a href="régressions-non-linéaires.html#environnement-et-bibliothèques-utilisées-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Les modèles non linéaires ont été implémentés en Python principalement via :</p>
+<ul>
+<li><strong>scikit-learn</strong>
+<ul>
+<li>modèles : <code>KNeighborsRegressor</code>, <code>DecisionTreeRegressor</code>, <code>RandomForestRegressor</code>, <code>SVR</code></li>
+<li>pipelines : <code>Pipeline</code>, <code>ColumnTransformer</code></li>
+<li>prétraitement : <code>OneHotEncoder</code>, scalers (<code>StandardScaler</code>, <code>MinMaxScaler</code>, <code>RobustScaler</code>, etc.)</li>
+<li>validation croisée et optimisation : <code>GridSearchCV</code>, <code>KFold</code></li>
+<li>métriques : RMSE (via score négatif), MAE, R²</li>
+</ul></li>
+<li><strong>numpy</strong>
+<ul>
+<li>transformation de la cible (<code>log1p</code>, <code>expm1</code>)</li>
+<li>calculs auxiliaires (MAPE, agrégation des scores)</li>
+</ul></li>
+<li><strong>pandas</strong>
+<ul>
+<li>structuration des résultats</li>
+<li>export CSV des tableaux finaux</li>
+</ul></li>
+</ul>
+<blockquote>
+<p><strong>Remarque</strong> : le choix de <code>GridSearchCV</code> combiné à des pipelines garantit que <strong>toutes les transformations (encodage + scaling)</strong> sont apprises <strong>uniquement sur le train</strong> dans chaque fold de validation croisée, évitant ainsi tout <em>data leakage</em>.</p>
+</blockquote>
+</div>
+<div id="rappels" class="section level2 hasAnchor" number="4.2">
+<h2><span class="header-section-number">4.2</span> Rappels<a href="régressions-non-linéaires.html#rappels" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="découpage-train-test" class="section level3 hasAnchor" number="4.2.1">
+<h3><span class="header-section-number">4.2.1</span> Découpage train / test<a href="régressions-non-linéaires.html#découpage-train-test" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Le dataset est découpé une seule fois en :</p>
+<ul>
+<li><strong>Train : 80 %</strong></li>
+<li><strong>Test : 20 %</strong></li>
+</ul>
+<p>Ce split est conservé identique pour tous les modèles afin de rendre les comparaisons fiables.</p>
+<hr />
+</div>
+<div id="prétraitement-et-pipeline-anti-fuite" class="section level3 hasAnchor" number="4.2.2">
+<h3><span class="header-section-number">4.2.2</span> Prétraitement et pipeline anti-fuite<a href="régressions-non-linéaires.html#prétraitement-et-pipeline-anti-fuite" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Les variables explicatives comprennent :</p>
+<ul>
+<li><strong>numériques</strong> : <code>age</code>, <code>bmi</code>, <code>children</code></li>
+<li><strong>catégorielles</strong> : <code>sex</code>, <code>smoker</code>, <code>region</code></li>
+</ul>
+<p>Le prétraitement est intégré dans un <code>ColumnTransformer</code> :</p>
+<ul>
+<li><strong>catégorielles</strong> : <code>OneHotEncoder(drop="first", handle_unknown="ignore")</code></li>
+<li><strong>numériques</strong> : scaling testé selon les modèles</li>
+</ul>
+<blockquote>
+<p><strong>Important : scaling uniquement sur les numériques</strong><br />
+Les colonnes issues du OneHotEncoding sont des indicatrices (0/1).<br />
+Les “scaler” doivent être appliqués <strong>uniquement aux variables numériques</strong>, afin de :
+- conserver le sens des indicatrices ;
+- éviter une transformation inutile qui peut dégrader les performances.</p>
+</blockquote>
+<hr />
+</div>
+<div id="validation-croisée-et-optimisation" class="section level3 hasAnchor" number="4.2.3">
+<h3><span class="header-section-number">4.2.3</span> Validation croisée et optimisation<a href="régressions-non-linéaires.html#validation-croisée-et-optimisation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><strong>Validation croisée</strong> : 5 folds (<code>cv = 5</code>)</li>
+<li><strong>Optimisation</strong> : recherche sur grille avec <code>GridSearchCV</code></li>
+<li><strong>Critère CV</strong> : <code>neg_root_mean_squared_error</code><br />
+Ce score est négatif par convention scikit-learn : maximiser <code>neg_RMSE</code> revient à <strong>minimiser RMSE</strong>.</li>
+</ul>
+<p>Une fois les meilleurs hyperparamètres sélectionnés en CV, le modèle est :</p>
+<ol style="list-style-type: decimal">
+<li>refité sur tout le train (<code>refit=True</code>) ;</li>
+<li>évalué une seule fois sur le test.</li>
+</ol>
+<hr />
+</div>
+<div id="deux-stratégies-de-modélisation-de-la-cible" class="section level3 hasAnchor" number="4.2.4">
+<h3><span class="header-section-number">4.2.4</span> Deux stratégies de modélisation de la cible<a href="régressions-non-linéaires.html#deux-stratégies-de-modélisation-de-la-cible" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Comme pour les modèles linéaires, deux cadres sont comparés :</p>
+<ol style="list-style-type: decimal">
+<li><strong>Apprentissage direct sur <code>charges</code></strong></li>
+<li><strong>Apprentissage sur <code>log(1 + charges)</code></strong></li>
+</ol>
+<p>Dans le second cas, la prédiction se fait en deux étapes :</p>
+<ul>
+<li>prédiction sur l’échelle log : <span class="math inline">\(\widehat{y}^*\)</span></li>
+<li>retransformation en dollars :
+<span class="math display">\[
+\widehat{charges} = \exp(\widehat{y}^*) - 1
+\]</span></li>
+</ul>
+<p>Toutes les métriques reportées restent en <strong>dollars</strong>, afin de pouvoir comparer tous les modèles sur la même échelle.</p>
+<ul>
+<li><strong>Métriques reportées</strong> (train et test) :
+<ul>
+<li><h2 id="mse-rmse-mae-r²-mape." class="hasAnchor"><strong>MSE</strong>, <strong>RMSE</strong>, <strong>MAE</strong>, <strong>R²</strong>, <strong>MAPE</strong>.<a href="régressions-non-linéaires.html#mse-rmse-mae-r²-mape." class="anchor-section" aria-label="Anchor link to header"></a></h2></li>
+</ul></li>
+</ul>
+</div>
+</div>
+<div id="k-nearest-neighbors-knn-regressor" class="section level2 hasAnchor" number="4.3">
+<h2><span class="header-section-number">4.3</span> K-Nearest Neighbors (KNN Regressor)<a href="régressions-non-linéaires.html#k-nearest-neighbors-knn-regressor" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Le modèle <strong>KNN</strong> repose sur une logique de similarité : pour prédire la charge d’un individu, on considère ses <em>k</em> voisins les plus proches dans l’espace des variables explicatives.</p>
+<div id="pourquoi-le-scaling-est-indispensable-ici" class="section level3 hasAnchor" number="4.3.1">
+<h3><span class="header-section-number">4.3.1</span> Pourquoi le scaling est indispensable ici ?<a href="régressions-non-linéaires.html#pourquoi-le-scaling-est-indispensable-ici" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>KNN utilise une distance (euclidienne, Manhattan, etc.). Si les variables numériques ne sont pas à la même échelle (ex. <code>age</code> vs <code>bmi</code>), la distance est dominée par les variables à grande amplitude. Ainsi, le choix du scaling influence directement la performance.
+### Hyperparamètres optimisés</p>
+<p>Les paramètres optimisés en validation croisée incluent typiquement :</p>
+<ul>
+<li><code>n_neighbors</code> : nombre de voisins <span class="math inline">\(k\)</span></li>
+<li><code>weights</code> : <code>"uniform"</code> ou <code>"distance"</code></li>
+<li>éventuellement <code>p</code> : distance Manhattan (1) vs Euclidienne (2)</li>
+<li><strong>scaler</strong> : méthode de scaling appliquée aux variables numériques uniquement</li>
+</ul>
+</div>
+<div id="sorties-retenues" class="section level3 hasAnchor" number="4.3.2">
+<h3><span class="header-section-number">4.3.2</span> Sorties retenues<a href="régressions-non-linéaires.html#sorties-retenues" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li>meilleure combinaison (hyperparamètres + scaling),</li>
+<li>métriques Train/Test,</li>
+<li>RMSE test comme indicateur principal de comparaison.</li>
+</ul>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Métrique / Config</th>
+<th align="left">Cible Directe (Charges)</th>
+<th align="left">Cible Transformée (Log)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>Meilleur Scaling</strong></td>
+<td align="left"><code>MinMaxScaler()</code></td>
+<td align="left"><code>MinMaxScaler()</code></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Voisins (k)</strong></td>
+<td align="left">5</td>
+<td align="left">10</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Poids (Weights)</strong></td>
+<td align="left">distance</td>
+<td align="left">uniform</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>R² Test</strong></td>
+<td align="left"><strong>0.7549</strong></td>
+<td align="left">0.7201</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>RMSE Test</strong></td>
+<td align="left"><strong>5898.21</strong></td>
+<td align="left">6302.61</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>MAPE Test (%)</strong></td>
+<td align="left">35.35 %</td>
+<td align="left"><strong>24.25 %</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Approche Directe</strong> : Le modèle affiche un excellent <span class="math inline">\(R^2\)</span> de 0.7549, mais présente un surapprentissage massif sur l’entraînement avec un <span class="math inline">\(R^2_{train}\)</span> de 0.9983, dû au poids <code>distance</code>.</li>
+<li><strong>Approche Log</strong> : Le modèle est plus équilibré avec un <span class="math inline">\(R^2_{train}\)</span> de 0.7798 et offre une meilleure généralisation sur le test.</li>
+</ul>
+</div>
+</div>
+<div id="bien-que-le-r2-soit-plus-élevé-sur-les-charges-directes-lapproche-log-est-plus-pertinente-objectivement-car-elle-réduit-lerreur-relative-mape-de-35.35-à-24.25-.-la-transformation-log-permet-de-lisser-linfluence-des-voisins-aux-coûts-extrêmes." class="section level2 hasAnchor" number="4.4">
+<h2><span class="header-section-number">4.4</span> Bien que le <span class="math inline">\(R^2\)</span> soit plus élevé sur les charges directes, l’approche <strong>Log</strong> est plus pertinente objectivement car elle réduit l’erreur relative (MAPE) de <strong>35.35 % à 24.25 %</strong>. La transformation log permet de lisser l’influence des voisins aux coûts extrêmes.<a href="régressions-non-linéaires.html#bien-que-le-r2-soit-plus-élevé-sur-les-charges-directes-lapproche-log-est-plus-pertinente-objectivement-car-elle-réduit-lerreur-relative-mape-de-35.35-à-24.25-.-la-transformation-log-permet-de-lisser-linfluence-des-voisins-aux-coûts-extrêmes." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+</div>
+<div id="arbre-de-décision-decisiontreeregressor" class="section level2 hasAnchor" number="4.5">
+<h2><span class="header-section-number">4.5</span> Arbre de décision (DecisionTreeRegressor)<a href="régressions-non-linéaires.html#arbre-de-décision-decisiontreeregressor" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Le modèle <strong>Decision Tree</strong> construit des règles successives de partition de l’espace des données afin de prédire <code>charges</code>.</p>
+<div id="particularité-scaling-généralement-inutile" class="section level4 hasAnchor" number="4.5.0.1">
+<h4><span class="header-section-number">4.5.0.1</span> Particularité (scaling généralement inutile)<a href="régressions-non-linéaires.html#particularité-scaling-généralement-inutile" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Les arbres sont basés sur des seuils et des réductions d’impureté : ils ne dépendent pas d’une distance globale. La mise à l’échelle n’est donc <strong>pas nécessaire</strong>.</p>
+</div>
+<div id="hyperparamètres-optimisés-gridsearchcv" class="section level4 hasAnchor" number="4.5.0.2">
+<h4><span class="header-section-number">4.5.0.2</span> Hyperparamètres optimisés (GridSearchCV)<a href="régressions-non-linéaires.html#hyperparamètres-optimisés-gridsearchcv" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><code>max_depth</code> : profondeur maximale de l’arbre (contrôle la complexité).</li>
+<li><code>min_samples_leaf</code> : taille minimale d’une feuille (régularisation).</li>
+</ul>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Métrique / Config</th>
+<th align="left">Cible Directe (Charges)</th>
+<th align="left">Cible Transformée (Log)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>Meilleur Scaling</strong></td>
+<td align="left"><code>MinMaxScaler()</code></td>
+<td align="left"><code>StandardScaler()</code></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Max Depth</strong></td>
+<td align="left">5</td>
+<td align="left">5</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Min Samples Leaf</strong></td>
+<td align="left">10</td>
+<td align="left">20</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>R² Test</strong></td>
+<td align="left">0.8257</td>
+<td align="left"><strong>0.8325</strong></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>RMSE Test</strong></td>
+<td align="left">4973.29</td>
+<td align="left"><strong>4875.52</strong></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>MAPE Test (%)</strong></td>
+<td align="left">29.89 %</td>
+<td align="left"><strong>20.80 %</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Approche Directe</strong> : L’arbre franchit un cap de performance majeur avec un <span class="math inline">\(R^2\)</span> de 0.8257.</li>
+<li><strong>Approche Log</strong> : Les performances s’améliorent encore avec une RMSE plus basse de 4875.52.</li>
+</ul>
+<p>Le modèle <strong>Log</strong> l’emporte sur tous les indicateurs. La MAPE est réduite de 9 points (20.80 % contre 29.89 %), confirmant que la structure hiérarchique de l’arbre est plus efficace pour prédire des ordres de grandeur que des valeurs monétaires brutes asymétriques.</p>
+<hr />
+</div>
+</div>
+<div id="random-forest-randomforestregressor" class="section level2 hasAnchor" number="4.6">
+<h2><span class="header-section-number">4.6</span> Random Forest (RandomForestRegressor)<a href="régressions-non-linéaires.html#random-forest-randomforestregressor" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>La <strong>Random Forest</strong> est une méthode ensembliste basée sur le <strong>bagging</strong> :
+- entraînement de plusieurs arbres sur des sous-échantillons bootstrap,
+- agrégation (moyenne) des prédictions.
+- Elle réduit la variance d’un arbre unique et produit en général une performance plus stable.</p>
+<div id="hyperparamètres-optimisés-gridsearchcv-1" class="section level3 hasAnchor" number="4.6.1">
+<h3><span class="header-section-number">4.6.1</span> Hyperparamètres optimisés (GridSearchCV)<a href="régressions-non-linéaires.html#hyperparamètres-optimisés-gridsearchcv-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><code>n_estimators</code> : nombre d’arbres.</li>
+<li><code>max_depth</code> : profondeur maximale.</li>
+<li><code>min_samples_leaf</code> : taille minimale d’une feuille.</li>
+</ul>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Métrique / Config</th>
+<th align="left">Cible Directe (Charges)</th>
+<th align="left">Cible Transformée (Log)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>Meilleur Scaling</strong></td>
+<td align="left"><code>StandardScaler()</code></td>
+<td align="left"><code>RobustScaler()</code></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>N Estimators</strong></td>
+<td align="left">100 (Baseline)</td>
+<td align="left">200</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Min Samples Leaf</strong></td>
+<td align="left">20</td>
+<td align="left">10</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>R² Test</strong></td>
+<td align="left">0.8325</td>
+<td align="left"><strong>0.8350</strong></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>RMSE Test</strong></td>
+<td align="left">4875.52</td>
+<td align="left"><strong>4839.95</strong></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>MAPE Test (%)</strong></td>
+<td align="left">20.80 %</td>
+<td align="left"><strong>18.28 %</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Approche Directe</strong> : Offre une performance robuste, identique à l’arbre de décision log en termes de <span class="math inline">\(R^2\)</span> (0.8325).</li>
+<li><strong>Approche Log</strong> : Atteint le sommet des performances avec un <span class="math inline">\(R^2\)</span> de 0.8350 et une MAPE minimale de 18.28 %.</li>
+</ul>
+<p>Le <strong>Random Forest (log)</strong> est le meilleur modele non linéaire dans le cadre de cette étude. L’utilisation du <code>RobustScaler</code> combinée à la transformation log permet de gérer efficacement les individus ayant des coûts atypiques, offrant la prédiction la plus précise et stable du projet.</p>
+<hr />
+</div>
+</div>
+<div id="support-vector-regression-svr" class="section level2 hasAnchor" number="4.7">
+<h2><span class="header-section-number">4.7</span> Support Vector Regression (SVR)<a href="régressions-non-linéaires.html#support-vector-regression-svr" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>La <strong>SVR</strong> apprend une fonction de prédiction en maximisant une marge et en tolérant une bande d’erreur contrôlée (epsilon-insensitive loss).</p>
+<div id="pourquoi-le-scaling-est-indispensable-ici-1" class="section level3 hasAnchor" number="4.7.1">
+<h3><span class="header-section-number">4.7.1</span> Pourquoi le scaling est indispensable ici ?<a href="régressions-non-linéaires.html#pourquoi-le-scaling-est-indispensable-ici-1" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>SVR repose sur des distances dans l’espace transformé (kernel RBF le plus souvent). Sans scaling, le modèle devient instable et les hyperparamètres perdent leur sens.</p>
+<div id="hyperparamètres-optimisés-gridsearchcv-2" class="section level4 hasAnchor" number="4.7.1.1">
+<h4><span class="header-section-number">4.7.1.1</span> Hyperparamètres optimisés (GridSearchCV)<a href="régressions-non-linéaires.html#hyperparamètres-optimisés-gridsearchcv-2" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ul>
+<li><code>C</code> : pénalisation des erreurs</li>
+<li><code>gamma</code> : influence locale des points (kernel)</li>
+<li><code>epsilon</code> : zone de tolérance autour de la prédiction</li>
+<li><code>kernel</code> : linéaire / RBF (selon votre grille)</li>
+<li>scaler numérique : testé conjointement</li>
+</ul>
+<table>
+<colgroup>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Métrique / Config</th>
+<th align="left">Cible Directe (Charges)</th>
+<th align="left">Cible Transformée (Log)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>Meilleur Scaling</strong></td>
+<td align="left"><code>passthrough</code></td>
+<td align="left"><code>passthrough</code></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Kernel / C</strong></td>
+<td align="left">linéaire / 100</td>
+<td align="left">linéaire / 100</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>R² Test</strong></td>
+<td align="left">0.5178</td>
+<td align="left">0.5178</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>RMSE Test</strong></td>
+<td align="left">8273.47</td>
+<td align="left">8273.47</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>MAPE Test (%)</strong></td>
+<td align="left">20.58 %</td>
+<td align="left">20.58 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong><em>Analyse Individuelle &amp; Comparée :</em></strong>
+Les résultats sont strictement identiques entre les deux versions avec un noyau linéaire (R² = 0.5178). Objectivement, le SVR est moins performant que les arbres ou le KNN sur ce dataset. Bien que sa MAPE de 20.58 % soit compétitive, son faible pouvoir explicatif global (<span class="math inline">\(R^2\)</span>) limite son utilité pratique par rapport à une forêt aléatoire.</p>
+<hr />
+</div>
+</div>
+</div>
+<div id="tableau-comparatif-final-modèles-non-linéaires" class="section level2 hasAnchor" number="4.8">
+<h2><span class="header-section-number">4.8</span> Tableau comparatif final (modèles non linéaires)<a href="régressions-non-linéaires.html#tableau-comparatif-final-modèles-non-linéaires" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Les résultats sont synthétisés sous forme d’un tableau unique, comportant :
+- les métriques <strong>sur train</strong> (diagnostic d’apprentissage),
+- les métriques <strong>sur test</strong> (généralisation),
+- les meilleurs hyperparamètres issus de la validation croisée.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="régressions-non-linéaires.html#cb1-1" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-2"><a href="régressions-non-linéaires.html#cb1-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-3"><a href="régressions-non-linéaires.html#cb1-3" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
+<span id="cb1-4"><a href="régressions-non-linéaires.html#cb1-4" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="régressions-non-linéaires.html#cb1-5" tabindex="-1"></a><span class="co"># 1. Lecture du fichier</span></span>
+<span id="cb1-6"><a href="régressions-non-linéaires.html#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="régressions-non-linéaires.html#cb1-7" tabindex="-1"></a>res_models <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;metrics_lin_non_lin.xls&quot;</span>)</span>
+<span id="cb1-8"><a href="régressions-non-linéaires.html#cb1-8" tabindex="-1"></a><span class="co"># 2. Nettoyage</span></span>
+<span id="cb1-9"><a href="régressions-non-linéaires.html#cb1-9" tabindex="-1"></a>res_display <span class="ot">&lt;-</span> res_models <span class="sc">%&gt;%</span></span>
+<span id="cb1-10"><a href="régressions-non-linéaires.html#cb1-10" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">any_of</span>(<span class="fu">c</span>(<span class="st">&quot;MSE_train&quot;</span>, <span class="st">&quot;MSE_test&quot;</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-11"><a href="régressions-non-linéaires.html#cb1-11" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span> <span class="fu">round</span>(., <span class="dv">2</span>))) <span class="sc">%&gt;%</span></span>
+<span id="cb1-12"><a href="régressions-non-linéaires.html#cb1-12" tabindex="-1"></a>  <span class="fu">arrange</span>(RMSE_test)</span>
+<span id="cb1-13"><a href="régressions-non-linéaires.html#cb1-13" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="régressions-non-linéaires.html#cb1-14" tabindex="-1"></a><span class="co"># 5. Rendu Dynamique</span></span>
+<span id="cb1-15"><a href="régressions-non-linéaires.html#cb1-15" tabindex="-1"></a><span class="fu">datatable</span>(res_display, </span>
+<span id="cb1-16"><a href="régressions-non-linéaires.html#cb1-16" tabindex="-1"></a>          <span class="at">rownames =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb1-17"><a href="régressions-non-linéaires.html#cb1-17" tabindex="-1"></a>          <span class="at">caption =</span> <span class="st">&quot;Scénario 1 : charges + OneHotEncoder (Pipeline)&quot;</span>,</span>
+<span id="cb1-18"><a href="régressions-non-linéaires.html#cb1-18" tabindex="-1"></a>          <span class="at">options =</span> <span class="fu">list</span>(<span class="at">scrollX =</span> <span class="cn">TRUE</span>, <span class="at">pageLength =</span> <span class="dv">6</span>))</span></code></pre></div>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-b8d51ecb3432c351a557" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-b8d51ecb3432c351a557">{"x":{"filter":"none","vertical":false,"caption":"<caption>Scénario 1 : charges + OneHotEncoder (Pipeline)<\/caption>","data":[["Random Forest (log)","Decision Tree (log)","Random Forest","Decision Tree","Ridge","ElasticNet","Lasso","SVR","SVR (log)","ElasticNet (log)","Ridge (log)","Lasso (log)"],["{'model__max_depth': None, 'model__min_samples_leaf': 10, 'model__n_estimators': 200, 'preprocessor__Scalers': RobustScaler()}","{'model__max_depth': 5, 'model__min_samples_leaf': 20, 'preprocessor__Scalers': StandardScaler()}","{'model__max_depth': 5, 'model__min_samples_leaf': 20, 'preprocessor__Scalers': StandardScaler()}","{'model__max_depth': 5, 'model__min_samples_leaf': 10, 'preprocessor__Scalers': MinMaxScaler()}","{'model__alpha': 0.22229964825261955, 'preprocessor__Scalers': MaxAbsScaler()}","{'model__alpha': 10.0, 'model__l1_ratio': 1.0, 'preprocessor__Scalers': StandardScaler()}","{'model__alpha': 79.06043210907701, 'preprocessor__Scalers': 'passthrough'}","{'model__C': 100, 'model__epsilon': 0.01, 'model__gamma': 'scale', 'model__kernel': 'linear', 'preprocessor__Scalers': 'passthrough'}","{'model__C': 100, 'model__epsilon': 0.01, 'model__gamma': 'scale', 'model__kernel': 'linear', 'preprocessor__Scalers': 'passthrough'}","{'model__alpha': 0.001, 'model__l1_ratio': 0.1, 'preprocessor__Scalers': MinMaxScaler()}","{'model__alpha': 0.4498432668969444, 'preprocessor__Scalers': MaxAbsScaler()}","{'model__alpha': 0.001, 'preprocessor__Scalers': 'passthrough'}"],[0.83,0.83,0.83,0.83,0.73,0.73,0.73,0.52,0.52,0.49,0.48,0.47],[4839.95,4875.52,4875.52,4973.29,6152,6156.25,6162.33,8273.469999999999,8273.469999999999,8549.469999999999,8584.370000000001,8645.129999999999],[2271.55,2411.16,2411.16,2757.07,4237.15,4249.78,4278.63,4132.29,4132.29,4455.17,4465.52,4481.68],[18.28,20.8,20.8,29.89,42.61,42.91,43.29,20.58,20.58,28.96,28.93,28.89],[0.89,0.88,0.88,0.88,0.75,0.75,0.75,0.54,0.54,0.55,0.54,0.54],[4087.94,4261.15,4261.15,4147.9,6022.09,6022.36,6032.74,8264.379999999999,8264.379999999999,8175.25,8218.08,8230.780000000001],[1833.75,2057.43,2057.43,2293.27,4135.37,4142.61,4171.02,3851.14,3851.14,4108.06,4125.69,4132.68],[14.13,17.1,17.1,25.24,41.24,41.48,42.1,18.32,18.32,25.57,25.58,25.5]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th>Model<\/th>\n      <th>best_params<\/th>\n      <th>R2_test<\/th>\n      <th>RMSE_test<\/th>\n      <th>MAE_test<\/th>\n      <th>MAPE_test<\/th>\n      <th>R2_train<\/th>\n      <th>RMSE_train<\/th>\n      <th>MAE_train<\/th>\n      <th>MAPE_train<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"scrollX":true,"pageLength":6,"columnDefs":[{"className":"dt-right","targets":[2,3,4,5,6,7,8,9]},{"name":"Model","targets":0},{"name":"best_params","targets":1},{"name":"R2_test","targets":2},{"name":"RMSE_test","targets":3},{"name":"MAE_test","targets":4},{"name":"MAPE_test","targets":5},{"name":"R2_train","targets":6},{"name":"RMSE_train","targets":7},{"name":"MAE_train","targets":8},{"name":"MAPE_train","targets":9}],"order":[],"autoWidth":false,"orderClasses":false,"lengthMenu":[6,10,25,50,100]}},"evals":[],"jsHooks":[]}</script>
+<p>Le tableau de résultats présente les performances de plusieurs modèles de régression évalués sur les ensembles d’entraînement et de test à l’aide de métriques standard : <span class="math inline">\(R^2\)</span>, RMSE, MSE, MAE et MAPE.</p>
+<div id="performances-globales-sur-lensemble-de-test" class="section level3 hasAnchor" number="4.8.1">
+<h3><span class="header-section-number">4.8.1</span> Performances globales sur l’ensemble de test<a href="régressions-non-linéaires.html#performances-globales-sur-lensemble-de-test" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Les <strong>meilleures performances globales</strong> sur l’ensemble de test sont obtenues par les modèles arborescents.</p>
+<ul>
+<li>Le <strong>Random Forest (log)</strong> atteint le <strong>meilleur <span class="math inline">\(R^2_{test}\)</span> (0,835)</strong> ainsi que le <strong>RMSE Test le plus faible (4 839,95)</strong>.<br />
+Il présente également la <strong>MAPE Test la plus basse (18,28 %)</strong> parmi l’ensemble des modèles évalués.</li>
+<li>Les modèles <strong>Decision Tree (log)</strong> et <strong>Random Forest (sur charges)</strong> affichent des performances très proches, avec un <span class="math inline">\(R^2_{test}\)</span> de <strong>0,833</strong> et un RMSE Test de <strong>4 875,52</strong>. Leur MAPE Test est identique (<strong>20,80 %</strong>).</li>
+<li>Le <strong>Decision Tree linéaire</strong> obtient un <span class="math inline">\(R^2_{test}\)</span> légèrement inférieur (<strong>0,826</strong>) et un RMSE Test plus élevé (<strong>4 973,29</strong>), accompagné d’une <strong>MAPE Test nettement plus importante (29,89 %)</strong>.</li>
+</ul>
+<p>Les <strong>modèles linéaires pénalisés</strong> (Ridge, ElasticNet, Lasso) présentent des performances inférieures :
+- Les valeurs de <span class="math inline">\(R^2_{test}\)</span> sont comprises entre <strong>0,732 et 0,733</strong>.
+- Les RMSE Test dépassent <strong>6 150</strong>.
+- Les MAPE Test sont élevées, comprises entre <strong>42,6 % et 43,3 %</strong>.</p>
+<p>Les <strong>SVR linéaires</strong>, avec ou sans transformation logarithmique, affichent un <span class="math inline">\(R^2_{test}\)</span> de <strong>0,518</strong>, un RMSE Test supérieur à <strong>8 270</strong>, et une MAPE Test d’environ <strong>20,58 %</strong>.</p>
+<p>Les versions <strong>logarithmiques des modèles linéaires pénalisés</strong> (Ridge log, Lasso log, ElasticNet log) obtiennent les <strong>plus faibles <span class="math inline">\(R^2_{test}\)</span></strong>, compris entre <strong>0,47 et 0,49</strong>, avec des RMSE Test supérieurs à <strong>8 500</strong> et des MAPE Test proches de <strong>29 %</strong>.</p>
+<hr />
+</div>
+<div id="erreur-relative-mape" class="section level3 hasAnchor" number="4.8.2">
+<h3><span class="header-section-number">4.8.2</span> Erreur relative (MAPE)<a href="régressions-non-linéaires.html#erreur-relative-mape" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>L’analyse de la MAPE Test met en évidence des écarts importants :</p>
+<ul>
+<li>Les <strong>MAPE Test les plus faibles</strong> sont observées pour :
+<ul>
+<li><strong>Random Forest (log)</strong> : <strong>18,28 %</strong></li>
+<li><strong>Decision Tree (log)</strong> et <strong>Random Forest</strong> : <strong>20,80 %</strong></li>
+<li><strong>SVR</strong> et <strong>SVR (log)</strong> : <strong>20,58 %</strong></li>
+</ul></li>
+<li>Les <strong>MAPE les plus élevées</strong> concernent les modèles linéaires pénalisés entraînés sur la cible linéaire, avec des valeurs supérieures à <strong>42 %</strong>.</li>
+<li>Les modèles linéaires pénalisés entraînés sur la cible logarithmique affichent des MAPE Test intermédiaires, proches de <strong>29 %</strong>.</li>
+</ul>
+<hr />
+</div>
+<div id="comparaison-entraînement-test" class="section level3 hasAnchor" number="4.8.3">
+<h3><span class="header-section-number">4.8.3</span> Comparaison entraînement / test<a href="régressions-non-linéaires.html#comparaison-entraînement-test" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>L’écart entre les performances d’entraînement et de test permet d’évaluer la généralisation des modèles :</p>
+<ul>
+<li>Les modèles <strong>Random Forest</strong> et <strong>Decision Tree</strong> présentent des <span class="math inline">\(R^2_{train}\)</span> compris entre <strong>0,877 et 0,887</strong>, contre <strong>0,826 à 0,835</strong> en test, indiquant un écart modéré.</li>
+<li>Les modèles linéaires pénalisés affichent des performances proches entre Train et Test, avec des <span class="math inline">\(R^2\)</span> autour de <strong>0,75</strong>, tant en entraînement qu’en test.</li>
+<li>Les <strong>SVR</strong> montrent des valeurs de <span class="math inline">\(R^2\)</span> quasi identiques entre Train et Test (<strong>≈ 0,538</strong>), accompagnées d’erreurs élevées sur les deux ensembles.</li>
+<li>Les modèles entraînés sur la cible logarithmique présentent systématiquement des <strong>MAPE Train inférieures aux MAPE Test</strong>, quel que soit le type de modèle.</li>
+</ul>
+<hr />
+</div>
+<div id="synthèse" class="section level3 hasAnchor" number="4.8.4">
+<h3><span class="header-section-number">4.8.4</span> Synthèse<a href="régressions-non-linéaires.html#synthèse" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li>Les <strong>modèles arborescents</strong>, en particulier le <strong>Random Forest (log)</strong>, obtiennent les <strong>meilleures performances globales</strong> sur l’ensemble de test selon les métriques <span class="math inline">\(R^2\)</span>, RMSE et MAPE.</li>
+<li>Les <strong>modèles linéaires pénalisés</strong> présentent des performances plus faibles, tant en termes d’erreur absolue que relative.</li>
+<li>Les <strong>modèles SVR</strong> affichent une capacité explicative limitée malgré des erreurs relatives modérées.</li>
+<li>La <strong>transformation logarithmique de la variable cible</strong> est associée à une réduction de la MAPE pour les modèles arborescents, mais pas pour les modèles linéaires pénalisés.</li>
+</ul>
+<div style="background: #fdf6e3; padding: 20px; border-radius: 10px; border-left: 6px solid #b58900; margin-bottom: 25px;">
+<p>L’analyse des résultats montre que les modèles non linéaires, et plus particulièrement la <strong>Random Forest</strong>, améliorent significativement les performances prédictives par rapport aux modèles linéaires initialement étudiés.</p>
+</div>
+<p>Ces résultats motivent l’étude approfondie des <strong>méthodes ensemblistes avancées</strong>, qui visent à optimiser encore davantage la précision par un apprentissage séquentiel. La section suivante sera consacrée à l’implémentation et à la comparaison des algorithmes de boosting les plus performants</p>
+
+</div>
+</div>
+</div>
+<div class="full-width-wrapper">
+<footer style="margin-top: 5em; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+<div style="height: 4px; background: linear-gradient(90deg, #0A1C34 0%, #2D7FF9 50%, #0A1C34 100%);"></div>
+<div style="background: linear-gradient(180deg, #0A1C34 0%, #061222 100%); color: #EAF2FF; padding: 40px 0 20px 0; border-top: 1px solid rgba(255,255,255,0.05);">
+<div style="max-width: 1100px; margin: 0 auto; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between;">
+
+<div style="flex: 1; min-width: 300px;">
+<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+<div style="width: 40px; height: 40px; border-radius: 12px; background: rgba(45,127,249,0.2); border: 1px solid rgba(45,127,249,0.4); display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 15px rgba(45,127,249,0.2);">📊</div>
+<div>
+<h4 style="margin: 0; font-size: 1.1em; font-weight: 700; letter-spacing: 0.5px; color: #fff;">Prévisions des Coûts Médicaux</h4>
+<p style="margin: 0; font-size: 0.85em; color: #2D7FF9; font-weight: 600;">Machine Learning I — Projet de fin de module</p>
+</div>
+</div>
+<p style="font-size: 0.85em; line-height: 1.6; color: rgba(234,242,255,0.7); margin-bottom: 20px;">Analyse prédictive des charges d'assurance santé à partir de la base de données Insurance sur Kaggle.</p>
+<div style="padding-left: 10px; border-left: 2px solid #2D7FF9; font-style: italic; font-size: 0.82em; color: rgba(234,242,255,0.6);">
+"Machine Learning already has a goal which is to maximize predictive accuracy."<br>
+<span style="font-weight: 700; color: rgba(234,242,255,0.8);">— Michael Kearns</span>
+</div>
+</div>
+
+<div style="flex: 1; min-width: 280px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08);">
+<h5 style="margin: 0 0 15px 0; font-size: 0.75em; text-transform: uppercase; letter-spacing: 1.5px; color: #2D7FF9; text-align: center;">Membres du Groupe</h5>
+<ul style="list-style: none; padding: 0; margin: 0; font-size: 0.88em; line-height: 2;">
+<li><span style="color: #2D7FF9;">•</span> DIALLO Cheick Oumar</li>
+<li><span style="color: #2D7FF9;">•</span> FALL Ndeye Ramatoulaye Ndoye</li>
+<li><span style="color: #2D7FF9;">•</span> FOGWOUNG DJOUFACK Sarah-Laure</li>
+<li><span style="color: #2D7FF9;">•</span> NGUEMFOUO NGOUMTSA Célina</li>
+<li><span style="color: #2D7FF9;">•</span> RASAMOELINA Nihaviana Albert Paulinah</li>
+</ul>
+</div>
+
+<div style="flex: 0.8; min-width: 220px; text-align: right; display: flex; flex-direction: column; justify-content: space-between;">
+<div>
+<p style="font-size: 0.85em; color: rgba(234,242,255,0.7); margin-bottom: 15px;">Explorez notre code source</p>
+<a href="https://github.com/nncelina/ML_medical-coasts" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; background: #2D7FF9; color: #fff; text-decoration: none; border-radius: 10px; font-weight: 600; font-size: 0.9em; transition: 0.3s; box-shadow: 0 4px 15px rgba(45,127,249,0.3);">Accéder au GitHub <span style="font-size: 1.2em;">↗</span></a>
+</div>
+<div style="margin-top: 30px;">
+<div style="font-size: 0.75em; color: rgba(234,242,255,0.4); margin-bottom: 5px;">Promotion ISE2 2025–2026</div>
+<div style="font-size: 0.8em; font-weight: 600; color: rgba(234,242,255,0.6);">© ENSAE Dakar · Groupe Theme7</div>
+</div>
+</div>
+
+</div>
+<div style="max-width: 1100px; margin: 30px auto 0 auto; padding: 20px 20px 0 20px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; font-size: 0.7em; color: rgba(234,242,255,0.3); letter-spacing: 1px;">RÉALISÉ AVEC R BOOKDOWN, PYTHON & SCIKIT-LEARN</div>
+</div>
+</footer>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="modèles-de-régression-linéaire.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="méthodes-ensemblistes.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": false,
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/rstudio/bookdown-demo/edit/master/03-Regression_Non_Lineaires.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": ["_main.pdf", "_main.epub"],
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "section"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

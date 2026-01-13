@@ -1,0 +1,281 @@
+# Modèles de régression linéaire
+
+Cette section documente de manière exhaustive l’ensemble des **modèles de régression linéaire** implémentés dans le cadre de la prédiction des dépenses médicales individuelles (*charges*).   Ces modèles constituent la **première famille de méthodes étudiée**.
+
+## Environnement et bibliothèques utilisées
+
+Les modèles linéaires ont été implémentés en Python à l’aide des bibliothèques suivantes :
+
+- **scikit-learn**  
+  Utilisée pour :
+  - l’implémentation des modèles de régression linéaire (OLS, Ridge, Lasso, ElasticNet) ;
+  - la gestion des pipelines (*Pipeline*, *ColumnTransformer*) ;
+  - la validation croisée et la sélection d’hyperparamètres (*GridSearchCV*, *KFold*).
+
+- **numpy**  
+  Utilisée pour :
+  - les transformations mathématiques (transformation logarithmique, retransformation exponentielle) ;
+  - le calcul de métriques personnalisées.
+
+- **pandas**  
+  Utilisée pour :
+  - la manipulation des jeux de données ;
+  - la structuration et l’exportation des tableaux de résultats.
+
+- **statsmodels**  
+  Utilisée pour :
+  - les diagnostics statistiques des modèles linéaires ;
+  - le calcul du *Variance Inflation Factor (VIF)*.
+
+---
+
+## Préliminaires 
+
+### Découpage des données
+
+Le jeu de données a été scindé en deux sous-ensembles disjoints :
+
+- **80 % des observations** pour l’entraînement ;
+- **20 % des observations** pour le test.
+
+Ce découpage est effectué **une seule fois**, puis conservé strictement identique pour l’ensemble des modèles afin de garantir une comparaison équitable.
+
+Aucune information issue de l’échantillon de test n’est utilisée :
+- lors du prétraitement,
+- lors de la sélection des hyperparamètres,
+- lors de la validation croisée.
+
+---
+
+### Prétraitement des variables explicatives
+
+Les variables explicatives sont de nature mixte :
+
+- **numériques** : *age*, *bmi*, *children* ;
+- **catégorielles** : *sex*, *smoker*, *region*.
+
+Un prétraitement systématique est intégré dans des **pipelines scikit-learn**, assurant une application cohérente et reproductible.
+
+#### Encodage des variables catégorielles
+
+Les variables catégorielles sont transformées par **One-Hot Encoding**, avec :
+
+- suppression d’une modalité de référence (`drop = "first"`) afin d’éviter la colinéarité parfaite ;
+- gestion explicite des modalités inconnues (`handle_unknown = "ignore"`).
+
+#### Traitement des variables numériques
+
+Les variables numériques sont :
+- soit conservées telles quelles,
+- soit mises à l’échelle selon la méthode testée.
+
+Toutes les transformations sont **apprises exclusivement sur l’échantillon d’entraînement**, puis appliquées à l’échantillon de test.
+
+---
+
+### Mise à l’échelle des variables numériques
+
+Bien que les modèles linéaires ne nécessitent pas systématiquement de standardisation, plusieurs méthodes de mise à l’échelle ont été testées afin d’évaluer leur impact sur :
+
+- la stabilité numérique des estimations ;
+- l’efficacité des pénalisations de type Ridge et Lasso ;
+- les performances prédictives.
+
+Les méthodes évaluées sont :
+
+- **StandardScaler** ;
+- **MinMaxScaler** ;
+- **MaxAbsScaler** ;
+- **absence de mise à l’échelle** (*passthrough*).
+
+Le choix optimal est effectué par **validation croisée**, conjointement à la sélection des hyperparamètres.
+
+---
+
+### Transformation de la variable cible
+
+L’analyse exploratoire a mis en évidence une **forte asymétrie à droite** de la variable *charges*.  
+Deux cadres de modélisation ont donc été étudiés :
+
+1. **Modélisation directe de `charges`**
+2. **Modélisation de `log(1 + charges)`**
+
+Dans le second cas :
+- les modèles sont entraînés sur la cible transformée ;
+- les prédictions sont retranscrites sur l’échelle originale via :
+\[
+\widehat{charges} = \exp(\widehat{y}^*) - 1
+\]
+
+Toutes les métriques sont calculées **en dollars**, afin de garantir une comparaison.
+
+---
+
+### Métriques d’évaluation
+
+Les performances sont évaluées à l’aide des métriques suivantes :
+
+- **RMSE** : pénalise fortement les grandes erreurs ;
+- **MSE** : version quadratique brute de la RMSE ;
+- **MAE** : erreur absolue moyenne, plus robuste aux valeurs extrêmes ;
+- **R²** : proportion de la variance expliquée ;
+- **MAPE** : erreur relative moyenne en pourcentage.
+
+Les métriques sont calculées :
+- sur l’ensemble d’entraînement ;
+- sur l’ensemble de test.
+
+Cette double évaluation permet de détecter un éventuel **surapprentissage**.
+
+---
+
+## Régression linéaire multiple (OLS)
+
+La régression linéaire classique constitue le **modèle de référence** du projet.
+
+Elle repose sur les hypothèses suivantes :
+- relation linéaire entre les variables explicatives et la cible ;
+- erreurs centrées et indépendantes.
+
+Ce modèle ne comporte **aucun hyperparamètre** et sert de **baseline** pour l’évaluation des modèles régularisés.
+
+---
+
+## Diagnostics statistiques des modèles linéaires
+
+Au-delà des performances prédictives, plusieurs diagnostics statistiques ont été réalisés :
+
+- **Moyenne des résidus**
+La moyenne des résidus indique si le modèle a tendance à surestimer ou sous-estimer globalement la cible.
+
+  * **Approche Directe (Charges) :** La moyenne est de **$1.4981833441919948 \times 10^{-11}$**.
+  * **Approche Logarithmique (Log) :** La moyenne est de **$4.488722200384253 \times 10^{-15}$**.
+
+Dans les deux cas, la valeur est quasi nulle, ce qui confirme que nos modèles sont globalement non biaisés sur l'échantillon d'entraînement.
+
+- **Normalité des résidus**, afin d’évaluer la validité des hypothèses du modèle ;
+
+```{r duo-images, echo=FALSE, out.width='50%', fig.align='center'}
+knitr::include_graphics(c("images/Reg_Lin_LOG.png", "images/REG_LIN_CHARGES.png"))
+```
+
+Le test d'Anderson-Darling vérifie si les erreurs suivent une loi normale. Une p-value < 5% entraîne le rejet de la normalité.
+
+| Cible | p-value AD | Conclusion |
+|:---|:---:|:---|
+| **Charges Directes** | **0.0** | Hypothèse $H_0$ rejetée |
+| **Log Charges** | **0.0** | Hypothèse $H_0$ rejetée |
+
+Pour les charges directes, les résidus ne suivent pas une distribution normale.
+La transformation logarithmique, bien qu'elle réduise l'asymétrie de la cible, ne permet pas de corriger la non-normalité des résidus pour ce modèle.
+
+- **Homoscedasticité**, pour vérifier la constance de la variance des erreurs ;
+
+Le test de White vérifie la constance de la variance des résidus.
+* **Modèle Charges :** La p-value est de **$1.0679 \times 10^{-14}$**. On ne peut pas accepter l'hypothèse nulle d'homoscédasticité au risque 5%.
+* **Modèle Log :** La p-value est de **$3.6375 \times 10^{-16}$**. L'hypothèse nulle est également rejetée.
+
+**Analyse Comparée :** L'hétéroscédasticité est présente dans les deux modèles. Cela signifie que l'incertitude de nos prédictions varie en fonction des caractéristiques des individus (ex: les erreurs peuvent être plus grandes pour les fumeurs que pour les non-fumeurs).
+
+- **Multicolinéarité**, mesurée par le *Variance Inflation Factor (VIF)*.
+
+Le VIF est calculé **uniquement sur les variables numériques**, après transformation, afin d’éviter les effets artificiels liés aux variables indicatrices issues du One-Hot Encoding.
+
+| Variable | VIF | État |
+|:---|:---:|:---|
+| **age** | 1.014954 | Corrélation quasi nulle |
+| **bmi** | 1.014891 | Corrélation quasi nulle |
+| **children** | 1.000239 | Corrélation quasi nulle |
+
+Tous les VIF sont compris entre 1 et 5. Il n'existe aucun niveau critique de multicolinéarité ; chaque variable apporte une information indépendante au modèle.
+---
+
+## Régression Ridge
+
+La régression Ridge introduit une pénalisation de type \( \ell_2 \), permettant :
+
+- de réduire la variance du modèle ;
+- de stabiliser les coefficients ;
+- d’atténuer les effets de la multicolinéarité.
+
+Le paramètre de régularisation \( \alpha \) est sélectionné par **validation croisée à 5 plis**, conjointement au choix de la mise à l’échelle.
+
+| Métrique | Cible Directe (charges) | Cible Transformée (log) |
+|:---|:---|:---|
+| **Meilleur Scaling** | `MaxAbsScaler()` | `MaxAbsScaler()` |
+| **Alpha Optimal** | 0.222299 | 0.449843 |
+| **R² Test** | **0.73336** | 0.480835 |
+| **RMSE Test** | **6151.99** | 8584.37 |
+| **MAPE Test (%)** | 42.61 % | **28.92 %** |
+
+Le modèle Ridge sur cible directe est le plus performant en termes de variance expliquée ($R^2$), tandis que la version log réduit l'erreur relative (MAPE).
+---
+
+## Régression Lasso
+
+La régression Lasso repose sur une pénalisation \( \ell_1 \), permettant :
+
+- la régularisation du modèle ;
+- la sélection automatique de variables via l’annulation de certains coefficients.
+
+Le protocole expérimental est identique à celui de la régression Ridge.
+
+| Métrique | Cible Directe (charges) | Cible Transformée (log) |
+|:---|:---|:---|
+| **Meilleur Scaling** | `passthrough` (Aucun) | `passthrough` (Aucun) |
+| **Alpha Optimal** | 79.0604 | 0.001 |
+| **R² Test** | 0.73246 | 0.47346 |
+| **RMSE Test** | 6162.33 | 8645.12 |
+| **MAPE Test (%)** | 43.29 % | 28.89 % |
+
+Lasso préfère l'absence de mise à l'échelle (`passthrough`) pour les deux approches. Ses performances sont très proches de Ridge, indiquant peu de variables inutiles dans le dataset.
+
+---
+
+## Régression Elastic Net
+
+La régression Elastic Net combine les pénalisations Ridge et Lasso via deux hyperparamètres :
+
+- \( \alpha \) : intensité globale de la régularisation ;
+- \( l_1\_ratio \) : compromis entre \( \ell_1 \) et \( \ell_2 \).
+
+Une recherche sur grille est effectuée par validation croisée afin d’identifier la combinaison optimale.
+
+| Métrique | Cible Directe (charges) | Cible Transformée (log) |
+|:---|:---|:---|
+| **Meilleur Scaling** | `StandardScaler()` | `MinMaxScaler()` |
+| **Alpha Optimal** | 10.0 | 0.001 |
+| **L1_ratio Optimal** | 1.0 | 0.1 |
+| **R² Test** | 0.73299 | 0.48504 |
+| **MAPE Test (%)** | 42.91 % | 28.95 % |
+
+Sur la cible directe, l'ElasticNet converge vers un comportement Lasso (`l1_ratio=1.0`). Sur la cible log, il adopte un profil plus équilibré avec un ratio de 0.1.
+---
+
+## Synthèse des résultats des modèles linéaires
+
+| Modèle | MAE Test | MAPE (%) | RMSE Test | $R^2_{Test}$ |
+|:-------|:---------|:---------|:----------|:-------------|
+| **Ridge** | 4237.15 | 42.61 | **6152.00** | **0.7334** |
+| **Régression linéaire** | 4243.54 | 42.82 | 6154.05 | 0.7332 |
+| **ElasticNet** | 4249.78 | 42.91 | 6156.25 | 0.7330 |
+| **Lasso** | 4278.63 | 43.29 | 6162.33 | 0.7325 |
+| *ElasticNet (log)* | 4455.17 | **28.96** | 8549.47 | 0.4850 |
+| *Ridge (log)* | 4465.52 | 28.93 | 8584.37 | 0.4808 |
+| *Lasso (log)* | 4481.68 | 28.89 | 8645.13 | 0.4735 |
+| *Régression linéaire (log)* | 4486.07 | 28.83 | 8654.32 | 0.4723 |
+
+
+Les modèles linéaires entraînés sur la cible **non transformée** présentent les meilleures performances globales en termes de **RMSE** et de **$R^2$**, avec des résultats très proches entre OLS, Ridge, Lasso et ElasticNet.
+
+Les modèles entraînés sur **log(1 + charges)** affichent :
+- une dégradation du pouvoir explicatif global ;
+- mais une amélioration notable de l’erreur relative (**MAPE**).
+
+---
+
+## Conclusion intermédiaire
+
+Les modèles linéaires atteignent un **plafond de performance**, suggérant que les relations entre les variables explicatives et les charges médicales comportent des **non-linéarités** et des **interactions complexes**.
+
+Ces constats justifient le recours à des **modèles non linéaires et ensemblistes**, présentés dans la section suivante.

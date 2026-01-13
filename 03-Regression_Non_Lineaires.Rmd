@@ -1,0 +1,295 @@
+# Régressions non linéaires
+
+Cette sous-partie présente les modèles non linéaires entraînés après le prétraitement des données.  
+
+## Environnement et bibliothèques utilisées
+
+Les modèles non linéaires ont été implémentés en Python principalement via :
+
+- **scikit-learn**
+  - modèles : `KNeighborsRegressor`, `DecisionTreeRegressor`, `RandomForestRegressor`, `SVR`
+  - pipelines : `Pipeline`, `ColumnTransformer`
+  - prétraitement : `OneHotEncoder`, scalers (`StandardScaler`, `MinMaxScaler`, `RobustScaler`, etc.)
+  - validation croisée et optimisation : `GridSearchCV`, `KFold`
+  - métriques : RMSE (via score négatif), MAE, R²
+
+- **numpy**
+  - transformation de la cible (`log1p`, `expm1`)
+  - calculs auxiliaires (MAPE, agrégation des scores)
+
+- **pandas**
+  - structuration des résultats
+  - export CSV des tableaux finaux
+
+> **Remarque** : le choix de `GridSearchCV` combiné à des pipelines garantit que **toutes les transformations (encodage + scaling)** sont apprises **uniquement sur le train** dans chaque fold de validation croisée, évitant ainsi tout *data leakage*.
+
+## Rappels
+
+### Découpage train / test
+
+Le dataset est découpé une seule fois en :
+
+- **Train : 80 %**
+- **Test : 20 %**
+
+Ce split est conservé identique pour tous les modèles afin de rendre les comparaisons fiables.
+
+---
+
+### Prétraitement et pipeline anti-fuite
+
+Les variables explicatives comprennent :
+
+- **numériques** : `age`, `bmi`, `children`
+- **catégorielles** : `sex`, `smoker`, `region`
+
+Le prétraitement est intégré dans un `ColumnTransformer` :
+
+- **catégorielles** : `OneHotEncoder(drop="first", handle_unknown="ignore")`
+- **numériques** : scaling testé selon les modèles
+
+> **Important : scaling uniquement sur les numériques**  
+Les colonnes issues du OneHotEncoding sont des indicatrices (0/1).  
+Les “scaler” doivent être appliqués **uniquement aux variables numériques**, afin de :
+- conserver le sens des indicatrices ;
+- éviter une transformation inutile qui peut dégrader les performances.
+
+---
+
+### Validation croisée et optimisation
+
+- **Validation croisée** : 5 folds (`cv = 5`)
+- **Optimisation** : recherche sur grille avec `GridSearchCV`
+- **Critère CV** : `neg_root_mean_squared_error`  
+  Ce score est négatif par convention scikit-learn : maximiser `neg_RMSE` revient à **minimiser RMSE**.
+
+Une fois les meilleurs hyperparamètres sélectionnés en CV, le modèle est :
+
+1. refité sur tout le train (`refit=True`) ;
+2. évalué une seule fois sur le test.
+
+---
+
+### Deux stratégies de modélisation de la cible
+
+Comme pour les modèles linéaires, deux cadres sont comparés :
+
+1. **Apprentissage direct sur `charges`**
+2. **Apprentissage sur `log(1 + charges)`**
+
+Dans le second cas, la prédiction se fait en deux étapes :
+
+- prédiction sur l’échelle log : \(\widehat{y}^*\)
+- retransformation en dollars :
+\[
+\widehat{charges} = \exp(\widehat{y}^*) - 1
+\]
+
+Toutes les métriques reportées restent en **dollars**, afin de pouvoir comparer tous les modèles sur la même échelle.
+
+- **Métriques reportées** (train et test) :
+  - **MSE**, **RMSE**, **MAE**, **R²**, **MAPE**.
+---
+
+## K-Nearest Neighbors (KNN Regressor)
+
+Le modèle **KNN** repose sur une logique de similarité : pour prédire la charge d’un individu, on considère ses *k* voisins les plus proches dans l’espace des variables explicatives.
+
+### Pourquoi le scaling est indispensable ici ?
+KNN utilise une distance (euclidienne, Manhattan, etc.). Si les variables numériques ne sont pas à la même échelle (ex. `age` vs `bmi`), la distance est dominée par les variables à grande amplitude.  Ainsi, le choix du scaling influence directement la performance.
+### Hyperparamètres optimisés
+
+Les paramètres optimisés en validation croisée incluent typiquement :
+
+- `n_neighbors` : nombre de voisins \(k\)
+- `weights` : `"uniform"` ou `"distance"`
+- éventuellement `p` : distance Manhattan (1) vs Euclidienne (2)
+- **scaler** : méthode de scaling appliquée aux variables numériques uniquement
+
+### Sorties retenues
+- meilleure combinaison (hyperparamètres + scaling),
+- métriques Train/Test,
+- RMSE test comme indicateur principal de comparaison.
+
+| Métrique / Config | Cible Directe (Charges) | Cible Transformée (Log) |
+|:---|:---|:---|
+| **Meilleur Scaling** | `MinMaxScaler()` | `MinMaxScaler()` |
+| **Voisins (k)** | 5 | 10 |
+| **Poids (Weights)** | distance | uniform |
+| **R² Test** | **0.7549** | 0.7201 |
+| **RMSE Test** | **5898.21** | 6302.61 |
+| **MAPE Test (%)** | 35.35 % | **24.25 %** |
+
+* **Approche Directe** : Le modèle affiche un excellent $R^2$ de 0.7549, mais présente un surapprentissage massif sur l'entraînement avec un $R^2_{train}$ de 0.9983, dû au poids `distance`.
+* **Approche Log** : Le modèle est plus équilibré avec un $R^2_{train}$ de 0.7798 et offre une meilleure généralisation sur le test.
+
+Bien que le $R^2$ soit plus élevé sur les charges directes, l'approche **Log** est plus pertinente objectivement car elle réduit l'erreur relative (MAPE) de **35.35 % à 24.25 %**. La transformation log permet de lisser l'influence des voisins aux coûts extrêmes.
+---
+
+## Arbre de décision (DecisionTreeRegressor)
+
+Le modèle **Decision Tree** construit des règles successives de partition de l’espace des données afin de prédire `charges`.
+
+#### Particularité (scaling généralement inutile)
+Les arbres sont basés sur des seuils et des réductions d’impureté : ils ne dépendent pas d’une distance globale.  La mise à l’échelle n’est donc **pas nécessaire**.
+
+#### Hyperparamètres optimisés (GridSearchCV)
+- `max_depth` : profondeur maximale de l’arbre (contrôle la complexité).
+- `min_samples_leaf` : taille minimale d’une feuille (régularisation).
+
+| Métrique / Config | Cible Directe (Charges) | Cible Transformée (Log) |
+|:---|:---|:---|
+| **Meilleur Scaling** | `MinMaxScaler()` | `StandardScaler()` |
+| **Max Depth** | 5 | 5 |
+| **Min Samples Leaf** | 10 | 20 |
+| **R² Test** | 0.8257 | **0.8325** |
+| **RMSE Test** | 4973.29 | **4875.52** |
+| **MAPE Test (%)** | 29.89 % | **20.80 %** |
+
+* **Approche Directe** : L'arbre franchit un cap de performance majeur avec un $R^2$ de 0.8257.
+* **Approche Log** : Les performances s'améliorent encore avec une RMSE plus basse de 4875.52.
+
+Le modèle **Log** l'emporte sur tous les indicateurs. La MAPE est réduite de 9 points (20.80 % contre 29.89 %), confirmant que la structure hiérarchique de l'arbre est plus efficace pour prédire des ordres de grandeur que des valeurs monétaires brutes asymétriques.
+
+---
+
+## Random Forest (RandomForestRegressor)
+
+La **Random Forest** est une méthode ensembliste basée sur le **bagging** :
+- entraînement de plusieurs arbres sur des sous-échantillons bootstrap,
+- agrégation (moyenne) des prédictions.
+- Elle réduit la variance d’un arbre unique et produit en général une performance plus stable.
+
+### Hyperparamètres optimisés (GridSearchCV)
+- `n_estimators` : nombre d’arbres.
+- `max_depth` : profondeur maximale.
+- `min_samples_leaf` : taille minimale d’une feuille.
+
+| Métrique / Config | Cible Directe (Charges) | Cible Transformée (Log) |
+|:---|:---|:---|
+| **Meilleur Scaling** | `StandardScaler()` | `RobustScaler()` |
+| **N Estimators** | 100 (Baseline) | 200 |
+| **Min Samples Leaf** | 20 | 10 |
+| **R² Test** | 0.8325 | **0.8350** |
+| **RMSE Test** | 4875.52 | **4839.95** |
+| **MAPE Test (%)** | 20.80 % | **18.28 %** |
+
+* **Approche Directe** : Offre une performance robuste, identique à l'arbre de décision log en termes de $R^2$ (0.8325).
+* **Approche Log** : Atteint le sommet des performances avec un $R^2$ de 0.8350 et une MAPE minimale de 18.28 %.
+
+Le **Random Forest (log)** est le meilleur modele non linéaire dans le cadre de cette étude. L'utilisation du `RobustScaler` combinée à la transformation log permet de gérer efficacement les individus ayant des coûts atypiques, offrant la prédiction la plus précise et stable du projet.
+
+---
+
+## Support Vector Regression (SVR)
+
+La **SVR** apprend une fonction de prédiction en maximisant une marge et en tolérant une bande d’erreur contrôlée (epsilon-insensitive loss).
+
+### Pourquoi le scaling est indispensable ici ?
+SVR repose sur des distances dans l’espace transformé (kernel RBF le plus souvent). Sans scaling, le modèle devient instable et les hyperparamètres perdent leur sens.
+
+#### Hyperparamètres optimisés (GridSearchCV)
+- `C` : pénalisation des erreurs
+- `gamma` : influence locale des points (kernel)
+- `epsilon` : zone de tolérance autour de la prédiction
+- `kernel` : linéaire / RBF (selon votre grille)
+- scaler numérique : testé conjointement
+
+| Métrique / Config | Cible Directe (Charges) | Cible Transformée (Log) |
+|:---|:---|:---|
+| **Meilleur Scaling** | `passthrough` | `passthrough` |
+| **Kernel / C** | linéaire / 100 | linéaire / 100 |
+| **R² Test** | 0.5178 | 0.5178 |
+| **RMSE Test** | 8273.47 | 8273.47 |
+| **MAPE Test (%)** | 20.58 % | 20.58 % |
+
+***Analyse Individuelle & Comparée :***
+Les résultats sont strictement identiques entre les deux versions avec un noyau linéaire (R² = 0.5178). Objectivement, le SVR est moins performant que les arbres ou le KNN sur ce dataset. Bien que sa MAPE de 20.58 % soit compétitive, son faible pouvoir explicatif global ($R^2$) limite son utilité pratique par rapport à une forêt aléatoire.
+
+---
+
+## Tableau comparatif final (modèles non linéaires)
+
+Les résultats sont synthétisés sous forme d’un tableau unique, comportant :
+- les métriques **sur train** (diagnostic d’apprentissage),
+- les métriques **sur test** (généralisation),
+- les meilleurs hyperparamètres issus de la validation croisée.
+
+```{r, message=FALSE, warning=FALSE}
+library(readxl)
+library(dplyr)
+library(DT)
+
+# 1. Lecture du fichier
+
+res_models <- read.csv("metrics_lin_non_lin.xls")
+# 2. Nettoyage
+res_display <- res_models %>%
+  select(-any_of(c("MSE_train", "MSE_test"))) %>% 
+  mutate(across(where(is.numeric), ~ round(., 2))) %>%
+  arrange(RMSE_test)
+
+# 5. Rendu Dynamique
+datatable(res_display, 
+          rownames = FALSE,
+          caption = "Scénario 1 : charges + OneHotEncoder (Pipeline)",
+          options = list(scrollX = TRUE, pageLength = 6))
+```
+Le tableau de résultats présente les performances de plusieurs modèles de régression évalués sur les ensembles d’entraînement et de test à l’aide de métriques standard : $R^2$, RMSE, MSE, MAE et MAPE.  
+
+### Performances globales sur l’ensemble de test
+
+Les **meilleures performances globales** sur l’ensemble de test sont obtenues par les modèles arborescents.
+
+- Le **Random Forest (log)** atteint le **meilleur $R^2_{test}$ (0,835)** ainsi que le **RMSE Test le plus faible (4 839,95)**.  
+  Il présente également la **MAPE Test la plus basse (18,28 %)** parmi l’ensemble des modèles évalués.
+- Les modèles **Decision Tree (log)** et **Random Forest (sur charges)** affichent des performances très proches, avec un $R^2_{test}$ de **0,833** et un RMSE Test de **4 875,52**. Leur MAPE Test est identique (**20,80 %**).
+- Le **Decision Tree linéaire** obtient un $R^2_{test}$ légèrement inférieur (**0,826**) et un RMSE Test plus élevé (**4 973,29**), accompagné d’une **MAPE Test nettement plus importante (29,89 %)**.
+
+Les **modèles linéaires pénalisés** (Ridge, ElasticNet, Lasso) présentent des performances inférieures :
+- Les valeurs de $R^2_{test}$ sont comprises entre **0,732 et 0,733**.
+- Les RMSE Test dépassent **6 150**.
+- Les MAPE Test sont élevées, comprises entre **42,6 % et 43,3 %**.
+
+Les **SVR linéaires**, avec ou sans transformation logarithmique, affichent un $R^2_{test}$ de **0,518**, un RMSE Test supérieur à **8 270**, et une MAPE Test d’environ **20,58 %**.
+
+Les versions **logarithmiques des modèles linéaires pénalisés** (Ridge log, Lasso log, ElasticNet log) obtiennent les **plus faibles $R^2_{test}$**, compris entre **0,47 et 0,49**, avec des RMSE Test supérieurs à **8 500** et des MAPE Test proches de **29 %**.
+
+---
+
+### Erreur relative (MAPE)
+
+L’analyse de la MAPE Test met en évidence des écarts importants :
+
+- Les **MAPE Test les plus faibles** sont observées pour :
+  - **Random Forest (log)** : **18,28 %**
+  - **Decision Tree (log)** et **Random Forest** : **20,80 %**
+  - **SVR** et **SVR (log)** : **20,58 %**
+- Les **MAPE les plus élevées** concernent les modèles linéaires pénalisés entraînés sur la cible linéaire, avec des valeurs supérieures à **42 %**.
+- Les modèles linéaires pénalisés entraînés sur la cible logarithmique affichent des MAPE Test intermédiaires, proches de **29 %**.
+
+---
+
+### Comparaison entraînement / test
+
+L’écart entre les performances d’entraînement et de test permet d’évaluer la généralisation des modèles :
+
+- Les modèles **Random Forest** et **Decision Tree** présentent des $R^2_{train}$ compris entre **0,877 et 0,887**, contre **0,826 à 0,835** en test, indiquant un écart modéré.
+- Les modèles linéaires pénalisés affichent des performances proches entre Train et Test, avec des $R^2$ autour de **0,75**, tant en entraînement qu’en test.
+- Les **SVR** montrent des valeurs de $R^2$ quasi identiques entre Train et Test (**≈ 0,538**), accompagnées d’erreurs élevées sur les deux ensembles.
+- Les modèles entraînés sur la cible logarithmique présentent systématiquement des **MAPE Train inférieures aux MAPE Test**, quel que soit le type de modèle.
+
+---
+
+### Synthèse
+
+- Les **modèles arborescents**, en particulier le **Random Forest (log)**, obtiennent les **meilleures performances globales** sur l’ensemble de test selon les métriques $R^2$, RMSE et MAPE.
+- Les **modèles linéaires pénalisés** présentent des performances plus faibles, tant en termes d’erreur absolue que relative.
+- Les **modèles SVR** affichent une capacité explicative limitée malgré des erreurs relatives modérées.
+- La **transformation logarithmique de la variable cible** est associée à une réduction de la MAPE pour les modèles arborescents, mais pas pour les modèles linéaires pénalisés.
+
+<div style="background: #fdf6e3; padding: 20px; border-radius: 10px; border-left: 6px solid #b58900; margin-bottom: 25px;">
+L'analyse des résultats montre que les modèles non linéaires, et plus particulièrement la **Random Forest**, améliorent significativement les performances prédictives par rapport aux modèles linéaires initialement étudiés.
+</div>
+
+Ces résultats motivent l’étude approfondie des **méthodes ensemblistes avancées**, qui visent à optimiser encore davantage la précision par un apprentissage séquentiel. La section suivante sera consacrée à l'implémentation et à la comparaison des algorithmes de boosting les plus performants 

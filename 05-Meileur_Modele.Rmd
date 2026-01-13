@@ -1,0 +1,46 @@
+# Sélection et Validation du Modèle Final {#selection-modele}
+
+L'évaluation systématique des différentes architectures de régression, allant des modèles linéaires régularisés aux méthodes d'ensemble avancées, permet d'identifier la solution optimale pour la prédiction des charges d'assurance. Cette sélection repose sur un compromis entre le pouvoir explicatif ($R^2$), la minimisation de l'erreur quadratique ($RMSE$) et la précision relative ($MAPE$).
+
+## Synthèse Comparative des Performances
+
+L'analyse des résultats consolidés démontre une progression nette de la performance à mesure que la complexité des modèles augmente, soulignant la nature non linéaire des données.
+
+| Catégorie | Modèle | Cible | $R^2$ Test | $RMSE$ | $MAPE$ (%) |
+|:---|:---|:---:|:---:|:---:|:---:|
+| **Ensemble (Boosting)** | **CatBoost** | Directe | **0.8429** | **4721.29** | 30.97 |
+| **Ensemble (Bagging)** | **Random Forest** | Log | 0.8350 | 4839.95 | **18.28** |
+| **Non-Linéaire** | **Decision Tree** | Log | 0.8325 | 4875.52 | 20.80 |
+| **Linéaire (Base)** | **Ridge** | Directe | 0.7334 | 6151.99 | 42.61 |
+
+
+## Discussion Technique et Justification du Choix
+
+L'examen des métriques révèle deux modèles dominants selon l'objectif métier privilégié :
+
+### 1. Optimisation de la Variance Globale : CatBoost
+Le modèle **CatBoost**, appliqué sur la cible directe, présente le coefficient de détermination le plus élevé de l'étude ($R^2 = 0.8429$). 
+* **Rigueur Statistique** : Il minimise la $RMSE$ (4721.29), ce qui indique une meilleure gestion des valeurs extrêmes (outliers) présentes dans les charges médicales élevées.
+* **Architecture** : Ses hyperparamètres optimaux (`depth: 4`, `iterations: 200`, `learning_rate: 0.03`) démontrent une complexité maîtrisée évitant le surapprentissage.
+
+### 2. Optimisation de l'Erreur Relative : Random Forest (Log)
+Le modèle **Random Forest** utilisant la transformation logarithmique de la cible se distingue par la plus faible Erreur Absolue Moyenne en Pourcentage ($MAPE = 18.28\%$).
+* **Analyse de la Transformation** : La transformation $y' = \ln(y)$ stabilise la variance et réduit l'impact de l'asymétrie à droite de la distribution des charges, permettant une précision relative supérieure sur les petits et moyens budgets.
+
+---
+
+## Sélection du Modèle 
+
+Le modèle **CatBoost (Cible Directe)** est retenu comme le modèle final car:
+1. **Pouvoir Explicatif Maximal** : Avec un $R^2$ de $0.8429$, ce modèle explique plus de 84 % de la variance des charges, surpassant la baseline linéaire de plus de 11 points.
+2. **Traitement Natif des Variables** : CatBoost traite de manière optimale les variables catégorielles (sexe, fumeur, région), limitant les biais d'encodage.
+3. **Robustesse** : La proximité entre les scores d'entraînement ($R^2 = 0.8825$) et de test ($R^2 = 0.8429$) témoigne d'une excellente capacité de généralisation du modèle.
+
+### Configuration Finale du Modèle Retenu
+* **Algorithme** : CatBoostRegressor
+* **Prétraitement** : One-Hot Encoding pour les variables catégorielles
+* **Hyperparamètres** : `depth` : 4, `iterations` : 200, `learning_rate` : 0.03
+
+<div style="background: #f1f8ff; padding: 15px; border-radius: 8px; border-left: 5px solid #0366d6;">
+**Note de Conclusion :** La supériorité des méthodes ensemblistes avancées confirme que la structure des coûts d'assurance est régie par des interactions complexes, notamment entre l'indice de masse corporelle (IMC) et le statut de fumeur, que seuls les modèles à base d'arbres régularisés parviennent à capturer pleinement.
+</div>

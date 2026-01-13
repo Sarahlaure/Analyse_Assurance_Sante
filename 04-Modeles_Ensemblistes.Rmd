@@ -1,0 +1,307 @@
+# Méthodes ensemblistes
+
+Après l’évaluation des modèles linéaires et non linéaires, nous avons étendu l’analyse aux **méthodes ensemblistes**.  
+Ces approches combinent plusieurs modèles (souvent des arbres de décision) afin d’améliorer la **généralisation**, réduire la **variance** (bagging) ou le **biais** (boosting), et mieux capturer les relations non linéaires présentes dans les dépenses médicales (*charges*).
+
+L’objectif de cette section est de documenter fidèlement :
+
+- les **imports / bibliothèques** et leur rôle,
+- le **processus complet** (split → preprocessing → CV → test),
+- les **4 scénarios** testés (cible + gestion des catégorielles),
+- les **hyperparamètres optimisés** et la méthode de sélection,
+- les **meilleurs paramètres obtenus** (best params) et les tableaux de synthèse.
+
+---
+
+## Environnement et bibliothèques utilisées
+
+Les méthodes ensemblistes ont été implémentées en Python avec :
+
+- **scikit-learn**
+  - Pipelines et prétraitement : `Pipeline`, `ColumnTransformer`, `OneHotEncoder`
+  - Validation croisée et tuning : `KFold`, `GridSearchCV`
+  - Modèles : `RandomForestRegressor`, `AdaBoostRegressor`, `GradientBoostingRegressor`
+- **xgboost**
+  - `XGBRegressor` (Gradient Boosting optimisé, régularisation, efficacité)
+- **lightgbm**
+  - `LGBMRegressor` (boosting très rapide via stratégie leaf-wise)
+- **catboost**
+  - `CatBoostRegressor` (optimisé pour variables catégorielles, robuste au surapprentissage)
+- **numpy / pandas**
+  - Transformations (`log1p`, `expm1`), structuration des résultats, export CSV
+
+> **Note :** l’ensemble des modèles et de la CV utilisent la même graine (`random_state`) pour rendre les comparaisons cohérentes.
+
+---
+
+## Processus expérimental commun (anti-fuite)
+
+### Split train/test
+
+- Découpage unique : **80 % train / 20 % test**
+- Le test reste **totalement isolé** :
+  - aucun prétraitement appris sur test,
+  - aucune sélection d’hyperparamètres faite sur test,
+  - le test sert uniquement à l’évaluation finale.
+
+---
+
+### Prétraitement (Pipeline)
+
+Deux stratégies de gestion des variables catégorielles ont été comparées :
+
+1. **Encodage One-Hot (OHE)** via `ColumnTransformer`
+2. **Traitement natif des catégorielles** (LightGBM / CatBoost), sans OHE
+
+#### 1) Cas avec OneHotEncoder (scénarios 1 et 2)
+
+- catégorielles → `OneHotEncoder(drop="first", handle_unknown="ignore")`
+- numériques → `passthrough`
+
+Ce prétraitement est intégré dans un pipeline :
+
+- `Pipeline(preprocess → model)`
+
+Ainsi, à chaque fold de CV :
+- le prétraitement est **fit uniquement sur le sous-train**,
+- puis appliqué au sous-validation,
+ce qui élimine le *data leakage*.
+
+#### 2) Cas natif (scénarios 3 et 4)
+
+- Les colonnes catégorielles sont converties en type `category`
+- Les modèles **LightGBM** et **CatBoost** apprennent directement avec ces variables
+- Objectif : tester si l’OHE est nécessaire ou si le traitement natif est plus performant/stable
+
+---
+
+### Validation croisée + optimisation
+
+- **CV :** `KFold(n_splits = 5, shuffle = TRUE, random_state = ...)`
+- **Optimisation :** `GridSearchCV`
+- **Critère de sélection :** `neg_root_mean_squared_error`  
+  (équivalent à minimiser la **RMSE**)
+
+Chaque modèle est donc entraîné selon la logique :
+
+1. pipeline construit,
+2. recherche sur grille effectuée **uniquement sur train**,
+3. meilleur modèle refité sur tout le train,
+4. métriques calculées sur **train** et **test**.
+
+---
+
+### Métriques reportées
+
+Pour chaque modèle, les métriques sont calculées sur :
+
+- **Train** : diagnostic d’apprentissage / surapprentissage
+- **Test** : performance de généralisation
+
+Métriques utilisées :
+
+- **MSE**, **RMSE** (critère principal),
+- **MAE**,
+- **R²**,
+- **MAPE(%)**.
+
+> Les tableaux finaux incluent également `Best_Params` (hyperparamètres retenus par CV).
+
+---
+
+## Description des algorithmes utilisés
+
+L'analyse s'appuie sur deux familles de méthodes ensemblistes : le **Bagging** et le **Boosting**.
+
+### Le Bagging (Bootstrap Aggregating)
+* **Random Forest** : Construit plusieurs arbres de décision indépendants sur des sous-ensembles aléatoires de données. La prédiction finale est la moyenne des prédictions de tous les arbres. 
+    * *Intérêt* : Réduit fortement la variance et le risque de surapprentissage (overfitting).
+
+### Le Boosting (Apprentissage séquentiel)
+Contrairement au Bagging, les modèles de Boosting construisent des arbres les uns après les autres. Chaque nouvel arbre tente de corriger les erreurs commises par les précédents.
+
+* **AdaBoost** : Ajuste les poids des observations : les individus mal prédits reçoivent un poids plus important pour le prochain arbre.
+* **Gradient Boosting** : Optimise une fonction de perte en ajoutant des arbres qui prédisent les résidus (erreurs) du modèle précédent.
+* **XGBoost** : Une version optimisée du Gradient Boosting incluant une régularisation avancée et une gestion efficace de la mémoire.
+* **LightGBM** : Utilise une croissance des arbres par "feuilles" (leaf-wise) plutôt que par niveaux, ce qui le rend extrêmement rapide sur de grands jeux de données.
+* **CatBoost** : Algorithme spécialisé dans le traitement des variables catégorielles. Il réduit le besoin de prétraitement (comme le One-Hot Encoding) et limite les biais de prédiction.
+
+| Famille | Modèle | Principal Atout |
+|:--- |:--- |:--- |
+| **Bagging** | Random Forest | Robustesse et stabilité face au bruit. |
+| **Boosting** | AdaBoost | Simplicité et focus sur les cas difficiles. |
+| **Boosting** | Gradient Boosting | Grande flexibilité et précision élevée. |
+| **Boosting** | XGBoost | Performance pure et régularisation (évite le surapprentissage). |
+| **Boosting** | LightGBM | Vitesse d'exécution et faible consommation mémoire. |
+| **Boosting** | CatBoost | Gestion native et performante des variables qualitatives. |
+
+
+## Resultats des 4 scénarios évalués
+
+Nous avons séparé les expérimentations selon deux axes :
+
+1. **Transformation de la cible :**
+   - `charges`
+   - `log1p(charges)` + retransformation `expm1()`
+
+2. **Traitement des catégorielles :**
+   - via **OneHotEncoder** (pipeline scikit-learn)
+   - via traitement **natif** (LightGBM / CatBoost)
+
+Cela conduit aux quatre scénarios suivants.
+
+---
+
+### Scénario 1 — charges + OneHotEncoder (Pipeline)
+
+- cible : `charges`
+- X : variables catégorielles encodées en OHE + numériques passthrough
+- sélection d’hyperparamètres : GridSearchCV sur train (CV=5)
+- métriques : calculées sur train et sur test (échelle dollars)
+
+**Modèles évalués :**
+RandomForest, GradientBoosting, AdaBoost, XGBoost, LightGBM, CatBoost.
+
+```{r tableau-resultats1, echo=FALSE, message=FALSE, warning=FALSE}
+library(readxl)
+library(dplyr)
+library(DT)
+
+# 1. Lecture du fichier
+
+res_models <- read.csv("metrics_ens_ohe.xls")
+# 2. Nettoyage
+res_display <- res_models %>%
+  select(-any_of(c("MSE_Train", "MSE_Test", "Best_Params"))) %>% 
+  mutate(across(where(is.numeric), ~ round(., 2))) %>%
+  arrange(RMSE_Test)
+
+# 5. Rendu Dynamique
+datatable(res_display, 
+          rownames = FALSE,
+          caption = "Scénario 1 : charges + OneHotEncoder (Pipeline)",
+          options = list(scrollX = TRUE, pageLength = 6))
+```
+
+### Scénario 2 — log1p(charges) + OneHotEncoder (Pipeline)
+
+- cible : `charges`
+- X : identique au scénario 1 (OHE + numériques)
+- après prédiction : retransformation expm1() pour revenir aux dollars
+- métriques : calculées en dollars (comparées à charges réelles)
+Ce scénario permet de tester si une cible plus “stable” statistiquement améliore la performance finale en dollars.
+
+**Modèles évalués :**
+RandomForest, GradientBoosting, AdaBoost, XGBoost, LightGBM, CatBoost.
+
+```{r tableau-resultats2, echo=FALSE, message=FALSE, warning=FALSE}
+# 1. Lecture du fichier
+
+res_models <- read.csv("metrics_ens_ohe_log.xls")
+# 2. Nettoyage
+res_display <- res_models %>%
+  select(-any_of(c("MSE_Train", "MSE_Test", "Best_Params"))) %>% 
+  mutate(across(where(is.numeric), ~ round(., 2))) %>%
+  arrange(RMSE_Test)
+
+# 5. Rendu Dynamique
+datatable(res_display, 
+          rownames = FALSE,
+          caption = "Scénario 2 : log1p(charges) + OneHotEncoder (Pipeline)",
+          options = list(scrollX = TRUE, pageLength = 6)) 
+```
+
+### Scénario 3 — charges + traitement natif des catégorielles (sans OHE)
+
+- modèles concernés : LightGBM et CatBoost
+- X : colonnes catégorielles converties en type category
+- cible : `charges`
+- sélection d’hyperparamètres : GridSearchCV sur train (CV=5)
+- métriques : train/test (dollars)
+
+```{r tableau-resultats3, echo=FALSE, message=FALSE, warning=FALSE}
+# 1. Lecture du fichier
+
+res_models <- read.csv("metrics_ens_charge.xls")
+# 2. Nettoyage
+res_display <- res_models %>%
+  select(-any_of(c("MSE_Train", "MSE_Test", "Best_Params"))) %>% 
+  mutate(across(where(is.numeric), ~ round(., 2))) %>%
+  arrange(RMSE_Test)
+
+# 5. Rendu Dynamique
+datatable(res_display, 
+          rownames = FALSE,
+          caption = "Scénario 3 : charges + traitement natif des catégorielles (sans OHE)",
+          options = list(scrollX = TRUE, pageLength = 6))  
+```
+
+### Scénario 4 — log1p(charges) + traitement natif (sans OHE)
+
+- modèles concernés : LightGBM et CatBoost
+- X : colonnes catégorielles converties en type category
+- cible : `log1p(charges)`
+- retransformation expm1() avant calcul des métriques en dollars
+- sélection d’hyperparamètres : GridSearchCV sur train (CV=5)
+- métriques : train/test (dollars)
+
+```{r tableau-resultats4, echo=FALSE, message=FALSE, warning=FALSE}
+# 1. Lecture du fichier
+
+res_models <- read.csv("metrics_ens_log.xls")
+# 2. Nettoyage
+res_display <- res_models %>%
+  select(-any_of(c("MSE_Train", "MSE_Test", "Best_Params"))) %>% 
+  mutate(across(where(is.numeric), ~ round(., 2))) %>%
+  arrange(RMSE_Test)
+
+# 5. Rendu Dynamique
+datatable(res_display, 
+          rownames = FALSE,
+          caption = "Scénario 3: logcharges + traitement natif des catégorielles (sans OHE)",
+          options = list(scrollX = TRUE, pageLength = 6)) 
+```
+
+## Comparaison des résultats
+
+```{r tableau-resultats5, echo=FALSE, message=FALSE, warning=FALSE}
+# 1. Lecture du fichier
+
+res_models <- read.csv("metrics_ens_final.xls")
+# 2. Nettoyage
+res_display <- res_models %>%
+  select(-any_of(c("MSE_Train", "MSE_Test", "Best_Params"))) %>% 
+  mutate(across(where(is.numeric), ~ round(., 2))) %>%
+  arrange(RMSE_Test)
+
+# 5. Rendu Dynamique
+datatable(res_display, 
+          rownames = FALSE,
+          caption = "Scénario 3: logcharges + traitement natif des catégorielles (sans OHE)",
+          options = list(scrollX = TRUE, pageLength = 6)) 
+```
+
+L’analyse des métriques de performance met en évidence plusieurs conclusions.
+
+### Performance globale des modèles
+
+Le modèle **CatBoost** (avec *One-Hot Encoding* ou traitement natif des variables catégorielles) présente les meilleures performances globales, avec le **RMSE Test le plus faible (4 721,29 $)** et le **meilleur coefficient de détermination** ($R^2_{Test} = 0,8429$).  
+Ces résultats indiquent une capacité supérieure à limiter les erreurs de grande amplitude sur la variable *charges*.
+
+### Supériorité des méthodes de Gradient Boosting
+
+Les algorithmes de **Gradient Boosting** (*GradientBoosting*, *XGBoost*, *CatBoost*) surpassent systématiquement le **Random Forest** et **AdaBoost** en termes de précision quadratique (RMSE).  
+Cette performance s’explique par leur mécanisme d’apprentissage itératif, qui corrige progressivement les erreurs résiduelles et permet une meilleure capture des relations non linéaires complexes.
+
+### Optimisation de l’erreur relative (MAPE)
+
+Une divergence marquée est observée selon la transformation de la variable cible.  
+Les modèles entraînés sur **$\log(1 + charges)$** (notamment *XGBoost Log* et *LightGBM Log*) affichent des **MAPE Test significativement plus faibles**, comprises entre **17 % et 18 %**, contre environ **30 %** pour les modèles entraînés sur la cible linéaire.
+
+L’apprentissage sur l’échelle logarithmique favorise la minimisation de l’erreur relative plutôt que de l’erreur absolue. Ainsi, bien que le RMSE soit légèrement moins performant, ces modèles produisent des prédictions plus justes en pourcentage, en particulier pour les **petites et moyennes factures médicales**.
+
+
+### Conclusion
+
+En conclusion, **CatBoost Standard** apparaît comme le modèle le plus performant pour **minimiser les erreurs absolues** et maximiser la qualité globale des prédictions.  
+Néanmoins, lorsque l’objectif est d’assurer une **meilleure précision relative**, notamment pour les faibles montants, les modèles entraînés sur une cible logarithmique constituent une alternative particulièrement pertinente.

@@ -1,0 +1,55 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+# Introduction
+
+## Contexte général
+
+Depuis la seconde moitié du XXᵉ siècle, les dépenses de santé ont connu une croissance soutenue dans la quasi-totalité des pays développés. Cette évolution s’explique par plusieurs facteurs structurels : le progrès médical, le vieillissement de la population, l’augmentation de la prévalence des maladies chroniques et l’élargissement de la couverture assurantielle. Selon l’Organisation de Coopération et de Développement Économiques (OCDE), les dépenses de santé représentent aujourd’hui plus de 9 % du PIB en moyenne dans les pays membres, avec des perspectives de hausse à long terme.
+
+Au-delà de leur niveau moyen, la forte concentration des dépenses médicales individuelles demeure un fait stylisé majeur. Une minorité d’individus génère une part disproportionnée des coûts totaux, ce qui se traduit par une distribution fortement asymétrique à droite, marquée par la présence de valeurs extrêmes. Cette propriété statistique pose des défis importants en matière de modélisation, de prévision et d’évaluation des risques, notamment pour les assureurs et les décideurs publics.
+
+Dans ce contexte, le recours aux méthodes de **machine learning** apparaît comme un levier pertinent pour mieux comprendre les déterminants des dépenses de santé et améliorer la précision des prédictions individuelles.
+
+---
+
+## Contexte de l’étude et source des données
+
+L’étude s’appuie sur la base de données *Insurance*, mise à disposition sur la plateforme Kaggle. Ce jeu de données synthétise des informations individuelles issues du système d’assurance santé américain. Il contient, pour chaque assuré, des caractéristiques démographiques (âge, sexe), comportementales (statut de fumeur), familiales (nombre d’enfants à charge), géographiques (région de résidence) ainsi que le montant annuel des charges médicales prises en charge par l’assurance.
+
+La variable d’intérêt principale, **charges**, correspond au coût médical annuel exprimé en dollars. 
+La problématique centrale du projet peut être formulée comme suit :
+
+> *Comment prédire les charges médicales individuelles à partir de caractéristiques observables ?*
+
+L’objectif de ce projet est donc de tirer parti de ces données afin de construire, comparer et évaluer plusieurs modèles de régression capables de prédire efficacement les charges médicales individuelles.
+
+---
+
+## Objectifs du projet
+
+Les objectifs poursuivis dans ce travail sont multiples :
+
+1. **Explorer et comprendre la structure des données**, à travers une analyse descriptive approfondie des variables numériques et catégorielles.
+2. **Mettre en place un prétraitement**, incluant l’encodage des variables catégorielles, la gestion de l’asymétrie de la cible et le choix des méthodes de standardisation.
+3. **Comparer plusieurs familles de modèles de régression**, en cohérence avec le cours de machine learning :
+   - modèles linéaires (régression linéaire, Ridge, Lasso, Elastic Net),
+   - modèles non linéaires (KNN, arbre de décision, Random Forest, SVR),
+   - méthodes ensemblistes (bagging, boosting, stacking, voting).
+4. **Évaluer les performances** à l’aide de métriques communes (MAE, MSE, RMSE, R², MAPE), en combinant validation croisée et évaluation sur un jeu de test.
+5. **Identifier le modèle le plus performant** et analyser ses erreurs afin de mieux comprendre ses limites et ses points forts.
+
+---
+
+## Organisation du document
+
+Le rapport est structuré de la manière suivante :
+
+- **Chapitre I — Analyse de la base de données** : présentation des données, prétraitement, analyse descriptive et choix des variables explicatives et de la cible.
+- **Chapitre II — Entraînement des modèles** : mise en œuvre des modèles linéaires, non linéaires et ensemblistes, avec optimisation des hyperparamètres par validation croisée.
+- **Chapitre III — Évaluation et comparaison des modèles** : analyse comparative des performances, choix du modèle final et diagnostics d’erreurs.
+- **Conclusion** : synthèse des résultats, limites du travail et pistes d’amélioration.
+- **Annexes** : rappels théoriques sur les métriques d’évaluation et détails techniques complémentaires.
+

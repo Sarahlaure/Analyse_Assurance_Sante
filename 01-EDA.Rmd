@@ -1,0 +1,154 @@
+# Analyse de la base de données
+
+## Présentation des données
+
+Le jeu de données utilisé dans ce projet provient de la base *Insurance* disponible sur la plateforme Kaggle. Il contient des informations individuelles relatives à des assurés du système de santé américain, ainsi que le montant annuel des charges médicales associées.
+
+La base comporte **1 338 observations** et **7 variables explicatives**, accompagnées d’une variable cible représentant les charges médicales annuelles exprimées en dollars.
+
+### Description des variables
+
+Les variables disponibles sont les suivantes :
+
+- **age** : âge de l’assuré (variable numérique continue).
+- **sex** : sexe de l’assuré (*male*, *female*).
+- **bmi** : indice de masse corporelle (Body Mass Index).
+- **children** : nombre d’enfants à charge.
+- **smoker** : statut tabagique (*yes*, *no*).
+- **region** : région de résidence (*northeast*, *northwest*, *southeast*, *southwest*).
+- **charges** : montant annuel des charges médicales (variable cible).
+
+Les variables explicatives comprennent à la fois des variables **numériques** et **catégorielles**, ce qui nécessite un prétraitement adapté avant toute modélisation.
+
+---
+
+## Prétraitement des données
+
+### Valeurs manquantes et doublons
+
+Une vérification systématique de la présence de valeurs manquantes a été réalisée. Aucune valeur manquante n’a été détectée dans la base.
+
+Un doublon exact a toutefois été identifié. En l’absence d’information permettant de déterminer s’il s’agit d’une répétition accidentelle ou de deux individus distincts partageant exactement les mêmes caractéristiques observées, ce doublon a été supprimé par précaution. Ce choix vise à éviter une surreprésentation d’un profil particulier dans l’échantillon, susceptible d’introduire un biais dans l’estimation des modèles.
+
+---
+
+### Typage des variables
+
+Les variables ont été correctement typées :
+
+- les variables numériques (*age*, *bmi*, *children*, *charges*) sont traitées comme quantitatives ;
+- les variables *sex*, *smoker* et *region* sont traitées comme catégorielles.
+
+Cette distinction est essentielle pour la mise en place des étapes d’encodage et de standardisation ultérieures.
+
+---
+
+## Analyse descriptive
+
+### Analyse univariée des variables numériques
+
+Les variables numériques ont été analysées à l’aide de statistiques descriptives (moyenne, médiane, quartiles, écart-type) et de représentations graphiques (histogrammes et boxplots), afin d’évaluer leur distribution, leur dispersion et la présence éventuelle de valeurs extrêmes.
+
+```{r trio-images, echo=FALSE, out.width='50%', fig.align='center'}
+knitr::include_graphics(c("images/age.png", "images/bmi.png", "images/children.png"))
+```
+
+Cette analyse met en évidence :
+
+- une distribution relativement régulière pour les variables **age** et **children**, caractérisée par une dispersion modérée et une absence de valeurs extrêmes marquées ;
+- une variabilité plus prononcée pour **bmi**, avec une dispersion intermédiaire mais sans asymétrie excessive (skweness=0,284) ;
+- une forte asymétrie à droite pour la variable **charges** (skweness=1.514), avec une concentration des observations à des niveaux de coûts relativement faibles et la présence de valeurs extrêmes élevées.
+
+---
+
+### Analyse univariée des variables catégorielles
+
+Les variables catégorielles ont été étudiées à partir des effectifs et des proportions associées à chacune de leurs modalités.
+
+```{r trio-images2, echo=FALSE, out.width='50%', fig.align='center'}
+knitr::include_graphics(c("images/region.png", "images/sexe.png", "images/smoker.png"))
+```
+
+Les résultats indiquent :
+
+- une répartition globalement équilibrée entre les sexes (49,5% d’hommes et 50,5% de femmes) ;
+- une majorité d’individus non-fumeurs, les fumeurs représentant une part plus restreinte de l’échantillon (20,49% de fumeurs contre 79,51% de non-fumeurs) ;
+- une distribution relativement homogène des individus entre les différentes régions géographiques (24,23% ; 24,23% ; 24,31% et 27,23% pour respectivement le northeast, northwest, southwest et southeast).
+
+---
+
+### Analyse bivariée avec la variable cible
+
+Une analyse bivariée a été menée afin d’étudier la relation entre chaque variable explicative et la variable cible **charges**, dans le but d’identifier les facteurs les plus discriminants et d’examiner la structure des coûts médicaux.
+
+#### Variables numériques et charges
+
+Les relations entre **charges** et les variables numériques (*age* et *bmi*) ont été analysées à l’aide de nuages de points.
+
+```{r trio-images4, echo=FALSE, out.width='50%', fig.align='center'}
+knitr::include_graphics(c("images/age_charges.png", "images/bmi_charges.png", "images/charges_children.png"))
+```
+
+Ces visualisations montrent :
+
+- une relation globalement croissante entre **age** et **charges**, indiquant que les coûts médicaux tendent à augmenter avec l’âge, bien que la dispersion reste importante ;
+- une relation positive plus marquée entre **bmi** et **charges**, avec une augmentation de la variabilité des charges pour des niveaux élevés de BMI.
+
+Ces éléments indiquent que les relations entre les variables numériques et la cible ne sont pas strictement linéaires et peuvent bénéficier de modèles capables de capturer des effets non linéaires.
+
+#### Variables catégorielles et charges
+
+Les relations entre **charges** et les variables catégorielles (*sex*, *smoker*, *region*, *children*) ont été étudiées à l’aide de boxplots comparatifs.
+
+```{r trio-images3, echo=FALSE, out.width='50%', fig.align='center'}
+knitr::include_graphics(c("images/region_charges.png", "images/sexe_charges.png", "images/smoker_charges.png"))
+```
+
+Les résultats montrent que :
+
+- la variable **smoker** est fortement discriminante : les fumeurs présentent des niveaux de charges nettement plus élevés que les non-fumeurs, avec une médiane et une dispersion significativement supérieures ;
+- pour les variables **sex** et **region**, les distributions des charges sont relativement proches entre les modalités, avec des médianes comparables et une dispersion similaire ;
+- la variable **children** ne met pas en évidence de séparation nette des charges entre les différents nombres d’enfants à charge.
+
+---
+
+### Test statistique : charges et statut tabagique
+
+Afin de confirmer cette observation, un test de Mann–Whitney a été réalisé pour comparer les distributions des charges entre fumeurs et non-fumeurs.
+Le résultat (p-value = 5.27e−130) conduit à rejeter l’hypothèse nulle d’égalité des distributions : les charges diffèrent significativement suivant que la personne soit fumeur ou non.
+Le test conduit à rejeter l’hypothèse d’égalité des distributions, indiquant une différence statistiquement significative des charges selon le statut tabagique. Cette variable apparaît ainsi comme un déterminant central des dépenses médicales.
+
+---
+
+## Transformation de la variable cible
+
+L’analyse de la distribution de la variable **charges** révèle une asymétrie marquée à droite, confirmée par un coefficient d’asymétrie élevé (skweness=1.514).
+
+Afin de stabiliser la variance et de réduire l’influence des valeurs extrêmes, une transformation logarithmique de la cible a été envisagée :
+
+\[
+y^* = \ln(1 + \text{charges})
+\]
+
+Cette transformation permet d’obtenir une distribution nettement plus symétrique (skweness=-0.0897), comme le montrent les histogrammes et boxplots comparatifs entre **charges** et **log(charges)**. 
+
+Deux pistes de modélisation sont ainsi définies :
+
+- une modélisation directe sur **charges** (interprétation immédiate en dollars) ;
+- une modélisation sur **log(1 + charges)**, suivie d’une retransformation par \(\exp(y^*) - 1\) pour l’évaluation finale.
+
+---
+
+## Choix des variables explicatives et de la cible
+
+L’ensemble des variables explicatives disponibles a été conservé pour la modélisation, compte tenu de leur pertinence économique et statistique.
+
+La variable cible retenue est :
+- **charges** pour la modélisation directe ;
+- **log(1 + charges)** pour la modélisation avec transformation de la cible.
+
+Ce cadre permet une comparaison rigoureuse des performances des modèles tout en respectant les contraintes méthodologiques liées à la distribution des données.
+
+---
+
+*Cette phase d’analyse et de prétraitement constitue le socle sur lequel repose l’entraînement et l’évaluation des modèles de régression présentés dans la suite du document.*

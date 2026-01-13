@@ -1,0 +1,104 @@
+# Conclusion générale
+
+## Résumé des résultats
+
+Ce projet avait pour objectif principal de **prédire les dépenses médicales individuelles (*charges*)** à partir de caractéristiques socio-démographiques et comportementales issues de la base *Insurance* (Kaggle).  
+Au-delà de la simple recherche de performance prédictive, l’enjeu était de **comparer rigoureusement plusieurs familles de modèles**, tout en respectant des principes méthodologiques stricts : reproductibilité, absence de fuite d’information, validation croisée et analyse fine des métriques.
+
+L’étude a été structurée autour de trois grandes étapes :
+
+1. **Analyse exploratoire et prétraitement des données (EDA)**  
+   Cette phase a permis :
+   - d’identifier une **forte asymétrie** de la variable cible *charges* ;
+   - de mettre en évidence le rôle central du **statut tabagique** dans la variabilité des coûts médicaux ;
+   - de justifier l’exploration d’une **transformation logarithmique** de la cible.
+
+2. **Modélisation linéaire et non linéaire**  
+   Les modèles linéaires (OLS, Ridge, Lasso, ElasticNet) ont servi de **baseline**.  
+   Malgré leur interprétabilité et leur stabilité, ils atteignent rapidement un **plafond de performance**, suggérant l’existence de relations non linéaires et d’interactions complexes entre les variables explicatives.
+
+   Les modèles non linéaires (KNN, SVR, arbres de décision) ont permis d’améliorer partiellement les performances, mais restent sensibles :
+   - au choix des hyperparamètres,
+   - à la mise à l’échelle,
+   - au surapprentissage pour certains modèles.
+
+3. **Méthodes ensemblistes (Bagging et Boosting)**  
+   Les méthodes ensemblistes constituent le **cœur des résultats du projet**.  
+   Les algorithmes de **Gradient Boosting**, en particulier **CatBoost**, **XGBoost** et **LightGBM**, obtiennent les meilleures performances globales, tant en termes de **RMSE** que de **$R^2$**.
+
+   Deux constats majeurs émergent :
+   - l’apprentissage sur la cible **non transformée** maximise la précision absolue (RMSE) ;
+   - l’apprentissage sur **$\log(1 + charges)$** améliore significativement la **MAPE**, donc la précision relative, notamment pour les faibles et moyens niveaux de dépenses.
+
+En synthèse, le projet montre que :
+- les **modèles linéaires** sont insuffisants pour capturer toute la complexité des données ;
+- les **modèles ensemblistes**, et en particulier les méthodes de **boosting**, constituent les approches les plus adaptées à ce problème de prédiction.
+
+---
+
+## Limites de l’étude
+
+Malgré les résultats obtenus, plusieurs limites doivent être soulignées.
+
+### Limites liées aux données
+
+- **Taille du jeu de données** :  
+  La base *Insurance* contient environ 1 300 observations, ce qui reste modeste pour des modèles complexes comme le boosting. Cela peut accentuer le risque de surapprentissage.
+  
+- **Nombre limité de variables explicatives** :  
+  Les charges médicales dépendent de nombreux facteurs non observés ici (pathologies chroniques, antécédents médicaux, accès aux soins, couverture assurantielle détaillée, etc.).
+
+- **Contexte spécifique** :  
+  Les données concernent le système de santé américain. Les résultats ne sont donc pas directement généralisables à d’autres contextes institutionnels ou géographiques.
+
+### Limites méthodologiques
+
+- **Absence de validation externe** :  
+  Les performances sont évaluées uniquement via un découpage train/test sur une seule base.  
+  Aucune validation sur un jeu de données indépendant n’a été possible.
+
+- **Interprétabilité limitée des modèles ensemblistes** :  
+  Bien que performants, les modèles de boosting sont plus difficiles à interpréter que les modèles linéaires, ce qui peut constituer un frein dans un cadre réglementaire ou décisionnel.
+
+---
+
+## Recommandations et perspectives
+
+Plusieurs pistes d’amélioration et d’extension peuvent être envisagées.
+
+### Améliorations méthodologiques
+
+- **Validation croisée imbriquée (nested CV)**  
+  Permettrait d’obtenir une estimation plus robuste des performances en séparant strictement la sélection des hyperparamètres de l’évaluation finale.
+
+- **Analyse d’interprétabilité avancée**
+  - Importance des variables (feature importance),
+  - SHAP values ou méthodes similaires pour expliquer les prédictions des modèles de boosting.
+
+- **Optimisation plus fine des hyperparamètres**
+  L’usage de méthodes bayésiennes (ex. *Bayesian Optimization*, *Optuna*) pourrait améliorer la recherche d’hyperparamètres par rapport à une grille fixe.
+
+### Améliorations liées aux données
+
+- Intégrer des **variables médicales plus riches** (pathologies, traitements, historique des soins).
+- Ajouter des **variables socio-économiques** (revenu, type de contrat, couverture assurantielle).
+- Tester le modèle sur des **bases plus larges et plus hétérogènes**.
+
+### Perspectives applicatives
+
+- Utilisation du modèle pour :
+  - la **segmentation des assurés**,
+  - l’anticipation des coûts futurs,
+  - l’aide à la tarification ou à la gestion du risque.
+
+## Bibliographie
+
+- Breiman, L. (2001). *Random Forests*. Machine Learning, 45(1), 5–32.  
+- Friedman, J. H. (2001). *Greedy function approximation: A gradient boosting machine*. Annals of Statistics, 29(5), 1189–1232.  
+- Friedman, J. H. (2002). *Stochastic Gradient Boosting*. Computational Statistics & Data Analysis, 38(4), 367–378.  
+- Hastie, T., Tibshirani, R., & Friedman, J. (2009). *The Elements of Statistical Learning*. Springer.  
+- Pedregosa, F. et al. (2011). *Scikit-learn: Machine Learning in Python*. Journal of Machine Learning Research, 12, 2825–2830.  
+- Chen, T., & Guestrin, C. (2016). *XGBoost: A Scalable Tree Boosting System*. KDD.  
+- Ke, G. et al. (2017). *LightGBM: A Highly Efficient Gradient Boosting Decision Tree*. NeurIPS.  
+- Prokhorenkova, L. et al. (2018). *CatBoost: unbiased boosting with categorical features*. NeurIPS.  
+- Kaggle. *Medical Cost Personal Datasets*.  

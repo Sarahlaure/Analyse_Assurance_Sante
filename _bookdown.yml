@@ -1,0 +1,15 @@
+delete_merged_file: true
+output_dir: "docs"
+language:
+  ui:
+    chapter_name:
+rmd_files:
+  - index.Rmd
+  - 00-Introduction.Rmd
+  - 01-EDA.Rmd
+  - 02-Regression_Lineaire.Rmd
+  - 03-Regression_Non_Lineaires.Rmd
+  - 04-Modeles_Ensemblistes.Rmd
+  - 05-Meileur_Modele.Rmd
+  - 06-Conclusion.Rmd
+

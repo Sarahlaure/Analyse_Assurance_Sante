@@ -30,9 +30,12 @@ transformation-de-la-variable-cible-1
 métriques-dévaluation
 régression-linéaire-multiple-ols
 diagnostics-statistiques-des-modèles-linéaires
+tous-les-vif-sont-compris-entre-1-et-5.-il-nexiste-aucun-niveau-critique-de-multicolinéarité-chaque-variable-apporte-une-information-indépendante-au-modèle.
 régression-ridge
+le-modèle-ridge-sur-cible-directe-est-le-plus-performant-en-termes-de-variance-expliquée-r2-tandis-que-la-version-log-réduit-lerreur-relative-mape.
 régression-lasso
 régression-elastic-net
+sur-la-cible-directe-lelasticnet-converge-vers-un-comportement-lasso-l1_ratio1.0.-sur-la-cible-log-il-adopte-un-profil-plus-équilibré-avec-un-ratio-de-0.1.
 synthèse-des-résultats-des-modèles-linéaires
 conclusion-intermédiaire
 régressions-non-linéaires
@@ -44,8 +47,8 @@ validation-croisée-et-optimisation
 deux-stratégies-de-modélisation-de-la-cible
 k-nearest-neighbors-knn-regressor
 pourquoi-le-scaling-est-indispensable-ici
-hyperparamètres-optimisés
 sorties-retenues
+bien-que-le-r2-soit-plus-élevé-sur-les-charges-directes-lapproche-log-est-plus-pertinente-objectivement-car-elle-réduit-lerreur-relative-mape-de-35.35-à-24.25-.-la-transformation-log-permet-de-lisser-linfluence-des-voisins-aux-coûts-extrêmes.
 arbre-de-décision-decisiontreeregressor
 particularité-scaling-généralement-inutile
 hyperparamètres-optimisés-gridsearchcv
