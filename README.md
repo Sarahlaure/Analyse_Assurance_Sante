@@ -2,9 +2,7 @@
 
 ## 📌 Présentation générale du projet
 
-Ce projet a pour objectif de **prédire les dépenses médicales annuelles individuelles (`charges`)** à partir de caractéristiques socio-démographiques et comportementales issues du jeu de données *Insurance* (Kaggle).
-
-L’ensemble du travail est implémenté en **Python** et documenté via **Jupyter Notebook** et **Bookdown**.
+Ce projet a pour objectif de **prédire les dépenses médicales annuelles individuelles (`charges`)** à partir de caractéristiques socio-démographiques et comportementales issues du jeu de données *Insurance* (Kaggle).L’ensemble du travail est implémenté en **Python** et documenté via **Jupyter Notebook** et **Bookdown**.
 ---
 
 ## 🎯 Objectifs
@@ -51,6 +49,7 @@ L’ensemble du travail est implémenté en **Python** et documenté via **Jupyt
 ├── requirements.txt                  # Dépendances Python
 ├── README.md                         # Documentation du projet
 └── LICENSE
+```
 
 # Description des données et méthodologie
 
